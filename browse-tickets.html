@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoPlay - Browse Tickets</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🎰 LottoPlay</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="browse-tickets.html">Browse Tickets</a></li>
+                <li><a href="order-history.html">Order History</a></li>
+            </ul>
+            <div class="user-menu">
+                <a href="profile.html" style="text-decoration: none; color: var(--text-primary);">
+                    <div class="user-icon">👤</div>
+                </a>
+                <a href="index.html" class="btn btn-danger">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Search and Filter -->
+        <section class="mb-4">
+            <h2 class="section-title">Browse Tickets</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search tickets...">
+                </div>
+                
+                <select style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;">
+                    <option>All Prices</option>
+                    <option>Under $5</option>
+                    <option>$5 - $10</option>
+                    <option>Over $10</option>
+                </select>
+
+                <select style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;">
+                    <option>All Dates</option>
+                    <option>This Week</option>
+                    <option>This Month</option>
+                    <option>Next Month</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Tickets Grid -->
+        <section>
+            <div class="grid grid-4" id="tickets-grid"></div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

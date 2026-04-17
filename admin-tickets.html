@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoPlay - Manage Tickets</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🎰 LottoPlay Admin</div>
+            <ul class="nav-links">
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="admin-tickets.html">Manage Tickets</a></li>
+                <li><a href="#" onclick="alert('Analytics')">Analytics</a></li>
+                <li><a href="#" onclick="alert('Users')">Users</a></li>
+            </ul>
+            <div class="user-menu">
+                <span class="text-muted">Admin</span>
+                <div class="user-icon">👨‍💼</div>
+                <a href="index.html" class="btn btn-danger">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Manage Tickets</h2>
+
+        <!-- Add Ticket Section -->
+        <section class="mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="mb-3">Add New Ticket</h3>
+                    <form id="add-ticket-form" onsubmit="handleAddTicket(event)">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="form-group">
+                                <label for="ticket-name">Ticket Name</label>
+                                <input type="text" id="ticket-name" placeholder="Enter ticket name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticket-price">Price ($)</label>
+                                <input type="number" id="ticket-price" placeholder="0.00" step="0.01" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticket-prize">Prize Amount ($)</label>
+                                <input type="number" id="ticket-prize" placeholder="0.00" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticket-date">Drawing Date</label>
+                                <input type="date" id="ticket-date" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Add Ticket</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tickets List -->
+        <section>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 class="section-title" style="margin-bottom: 0;">All Tickets</h3>
+                <input type="text" placeholder="Search tickets..." style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; width: 200px;">
+            </div>
+
+            <div class="card">
+                <div class="card-body" style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color);">
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">ID</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Ticket Name</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Price</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Prize</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Drawing Date</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tickets-table-body">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ticket Statistics -->
+        <section style="margin-top: 2rem;">
+            <h3 class="section-title">Ticket Statistics</h3>
+            <div class="grid grid-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">Active Tickets</p>
+                        <div class="stat-value">8</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">Total Sales</p>
+                        <div class="stat-value">3,842</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">Total Revenue</p>
+                        <div class="stat-value">$125.4K</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">Avg Sale Value</p>
+                        <div class="stat-value">$32.65</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Edit Ticket Modal -->
+    <div id="edit-ticket-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeModal('edit-ticket-modal')">&times;</span>
+            <h2 class="mb-3">Edit Ticket</h2>
+            <form>
+                <div class="form-group">
+                    <label for="edit-ticket-name">Ticket Name</label>
+                    <input type="text" id="edit-ticket-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-ticket-price">Price ($)</label>
+                    <input type="number" id="edit-ticket-price" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-ticket-prize">Prize Amount ($)</label>
+                    <input type="number" id="edit-ticket-prize" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-ticket-date">Drawing Date</label>
+                    <input type="date" id="edit-ticket-date" required>
+                </div>
+
+                <button type="button" class="btn btn-primary" style="width: 100%;" 
+                        onclick="showAlert('Ticket updated successfully', 'success'); closeModal('edit-ticket-modal');">
+                    Update Ticket
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        table tr:hover {
+            background-color: var(--tertiary-dark);
+        }
+
+        table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table th {
+            padding: 1rem;
+        }
+    </style>
+
+    <script src="script.js"></script>
+</body>
+</html>

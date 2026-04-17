@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoPlay - Order History</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🎰 LottoPlay</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="browse-tickets.html">Browse Tickets</a></li>
+                <li><a href="order-history.html">Order History</a></li>
+            </ul>
+            <div class="user-menu">
+                <a href="profile.html" style="text-decoration: none; color: var(--text-primary);">
+                    <div class="user-icon">👤</div>
+                </a>
+                <a href="index.html" class="btn btn-danger">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Order History</h2>
+
+        <!-- Filter Section -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Search orders...">
+            </div>
+            
+            <select style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;">
+                <option>All Status</option>
+                <option>All Orders</option>
+                <option>Won</option>
+                <option>Pending</option>
+                <option>Lost</option>
+            </select>
+
+            <select style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;">
+                <option>All Time</option>
+                <option>Last 7 Days</option>
+                <option>Last Month</option>
+                <option>Last Year</option>
+            </select>
+        </div>
+
+        <!-- Orders Table -->
+        <section>
+            <div class="card">
+                <div class="card-body" style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color);">
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Order ID</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Ticket</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Purchase Date</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Drawing Date</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Numbers</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Price</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Status</th>
+                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Payout</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-body">
+                            <tr>
+                                <td colspan="8" style="padding: 1rem;">Loading history...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section style="margin-top: 2rem;">
+            <h3 class="section-title">Your Stats</h3>
+            <div class="stats">
+                <div class="stat-item card-body">
+                    <div class="stat-value" id="stat-total-orders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-item card-body">
+                    <div class="stat-value" id="stat-wins">0</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat-item card-body">
+                    <div class="stat-value" id="stat-winnings">$0.00</div>
+                    <div class="stat-label">Total Winnings</div>
+                </div>
+                <div class="stat-item card-body">
+                    <div class="stat-value" id="stat-spent">$0.00</div>
+                    <div class="stat-label">Amount Spent</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

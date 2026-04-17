@@ -1,0 +1,1034 @@
+Software Requirements Specification
+
+for
+
+Project Phase 1
+
+Version 1.0
+
+Prepared by
+
+Group Number: 14
+
+
+Contents
+
+Contents ii
+
+Revisions ii
+
+1 Introduction 1
+
+1.1 Document Purpose 1
+
+1.2 Product Scope 1
+
+1.3 Intended Audience and Document Overview 1
+
+1.4 Definitions, Acronyms, and Abbreviations 1
+
+1.5 Document Conventions 1
+
+1.6 References and Acknowledgments 2
+
+2 Overall Description 2
+
+2.1 Product Overview 2
+
+2.2 Product Functionality 3
+
+2.3 Operating Environment 3
+
+2.4 Design and Implementation Constraints 3
+
+2.5 Assumptions and Dependencies 3
+
+3 Specific Requirements 4
+
+3.1 External Interface Requirements 4
+
+3.2 Functional Requirements 4
+
+3.3 Use Case Model 5
+
+4 Other Non-functional Requirements 6
+
+4.1 Performance Requirements 6
+
+4.2 Safety and Security Requirements 6
+
+5 Other Requirements 7
+
+Appendix A - Group Log 8
+
+Revisions
+
+| Version | Primary Author(s)                                                                                              | Description of Version                                                                                                                               | Date Completed |
+| ------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| 1       | Janice Kennedy,<br><br>Starlika Bauskar,<br><br>Eshan Shrestha,<br><br>Brandt Schmidt,<br><br>Joanna Chimalilo | This is the initial release of the document. No discrete revisions have been logged, as the document was updated iteratively during its development. | 04/04/2026     |
+
+#
+
+# Introduction
+
+This document provides a description of the software requirements for the Lottery Purchase System (LPS). The LPS allows users to purchase lottery tickets through an online website, mobile app, or desktop platform, reducing reliance on physical retail locations. The system enables users to manage accounts, view ticket history, check winning numbers, and claim winnings electronically. Administrators are provided with system management features such as ticket configuration and sales reporting.
+
+This section introduces the overall purpose, scope, and structure of the document. It outlines the intended audience, defines key terms and acronyms, and describes the conventions used throughout the SRS. This fundamental information ensures that all stakeholders have a clear understanding of how to interpret the requirements presented in the following sections.
+
+## Document Purpose
+
+The purpose of this Software Requirements Specification (SRS) document is to define the functional and non-functional requirements of the LPS. This document is intended to guide the design, development, testing, and deployment of the system by providing a complete description of its features, constraints, and expected performance.
+
+The SRS acts as a communication tool between stakeholders, including developers, project managers, and system administrators, ensuring a shared understanding of the system's goals. It also serves as a baseline for validating the final product, confirming that the implemented system meets user needs, regulatory requirements, and performance expectations.
+
+## Product Scope
+
+The Lottery Purchase System (LPS) is an online platform designed to enable users to conveniently purchase, manage, and claim eligible lottery tickets through digital channels such as a website, mobile app, or desktop interface. The system allows registered users to browse available lottery games, manually select or automatically generate ticket numbers, securely complete purchases using approved payment methods, and access their tickets in electronic form. Users can also review past purchases, check winning numbers, and claim qualifying winnings directly through the platform. Administrative users are equipped with tools to manage ticket offerings, update pricing and prize configurations, and generate system performance and sales reports.
+
+The primary objective of the LPS is to improve accessibility and operational efficiency for both customers and the Texas Lottery Commission by removing wait times at retail locations and streamlining the ticket buying process. Major benefits of the system include increased user expedience, reduced operational costs, improved security of sensitive user data, and compliance with accessibility and regulatory standards. Ultimately, the LPS aims to modernize the lottery experience by delivering a fast, secure, and user-friendly digital solution.
+
+## Intended Audience
+
+This document is intended for multiple stakeholders involved in the development and implementation of the LPS. The primary audience includes the client, representing the Texas Lottery Commission, and the course instructor, who will review the system requirements to verify that the project meets the specified objectives and constraints. This document is also intended for developers and system designers who will use it as a guideline to implement the system's functionality, architecture, and user interface.
+
+Secondary audiences include testers, who will use this document to verify that the system behaves according to the defined requirements and use cases. Additionally, project managers will rely on it to track progress and ensure timely completion of deliverables. The document may also be useful for future maintainers or contributors who need a clear understanding of the system's intended behavior and design decisions. Overall, this SRS serves as a central reference to ensure all stakeholders share a common understanding of the system.
+
+## Definitions, Acronyms, and Abbreviations
+
+ADA - Americans with Disabilities Act of 1990
+
+Admin - Administrator
+
+API - Application Programming Interface
+
+DB - Database
+
+FCC - Federal Communications Commission
+
+GUI - Graphical User Interface
+
+IRS - Internal Revenue Service
+
+LPS - Lottery Purchase System
+
+SRS - Software Requirements Specification
+
+UI - User Interface
+
+UX - User Experience
+
+F.R. - Functional Requirement
+
+UC - Use Case
+
+Added Terms (Domain-Specific):
+
+Ticket - A digital lottery entry consisting of selected numbers and a unique identifier
+
+Transaction - A completed purchase operation involving payment and ticket generation
+
+Order History - A record of all past and current ticket purchases associated with a user account
+
+Claim - The process of redeeming winnings associated with a valid ticket
+
+Payment Provider - External system (e.g., PayPal, Venmo, bank service) used to process transactions
+
+## Document Conventions
+
+This document follows standard SRS guidelines based on IEEE formatting conventions. The document uses Arial font in size 11 for all body text, is single-spaced, and maintains 1-inch margins on all sides. The text is written in a clear, consistent, and formal manner and uses italics for comments.
+
+### Formatting Conventions
+
+- Section titles and headings are bolded and numbered for clear hierarchy.
+- Important terms or emphasis may be indicated using italics.
+- Lists and bullet points are used where appropriate to present information concisely and improve readability.
+
+### Naming Conventions
+
+- System components and features are referred to using consistent names (e.g., "Lottery Purchase System (LPS)").
+- Acronyms are defined upon first use and used consistently thereafter.
+- User roles like "Admin" or "User" are capitalized when referring to specific system roles.
+
+### Writing Conventions
+
+- The document uses formal, professional language.
+- Requirements are written in unambiguous statements to avoid misinterpretation.
+- Where applicable, "shall" is used to denote mandatory requirements, while "should" indicates optional or recommended features.
+
+## References and Acknowledgments
+
+- Americans with Disabilities Act of 1990 (ADA), U.S. Department of Justice, 1990. Available at: <https://www.ada.gov/>
+- IEEE Std 830-1998, IEEE Recommended Practice for Software Requirements Specifications.
+- Internal Revenue Service (IRS) Guidelines on Gambling Winnings and Reporting
+- Federal Communications Commission (FCC) Accessibility Guidelines
+
+# Overall Description
+
+## Product Overview
+
+The Lottery Purchase System (LPS) is a new, self-contained software product commissioned by the Texas Lottery Commission to address declining ticket sales driven by customer dissatisfaction with long wait times at retail locations. It is not a replacement for any existing digital system. The Commission has historically relied entirely on in-person retail sales, making this a greenfield development effort. The LPS will be delivered as a web-based platform, accessible via desktop browsers and mobile devices, enabling customers across Texas to register, purchase lottery tickets, and claim eligible winnings entirely online. The core platform, including authentication, ticket management, order processing, and the winner determination logic, is developed entirely in-house. The context diagram below illustrates the system boundary and its interactions with external entities.
+
+
+
+## Product Functionality
+
+The Lottery Purchase System (LPS) must support the following major functions:
+
+### User Account Management
+
+- Allow new users to register by providing name, email address, home address, phone number, and a password
+- Allow registered users to log in using their email and password
+- Allow users to view and manage their profile information
+
+### Homepage & Navigation
+
+- Display a homepage that provides navigation to all major sections of the system: browse tickets, previous winning numbers, profile, order history, and ticket search
+
+### Ticket Browsing & Search
+
+- Allow users to browse all available lottery tickets
+- Allow users to view detailed information for a specific ticket, including drawing date, ticket price, and winning prize amount
+- Allow users to search for a specific lottery ticket by name or type
+
+### Ticket Purchase
+
+- Allow users to select a lottery ticket and manually choose five numbers (ranging from 1 to 50) or use an auto-select option to randomly generate five numbers
+- Allow users to purchase up to ten tickets per transaction
+- Generate a unique electronic ticket upon successful purchase, consisting of a ticket number and a unique confirmation number
+- Allow users to print their electronic ticket or display it on a device screen
+
+### Payment Processing
+
+- Accept payment exclusively via PayPal, Venmo, or a linked bank account
+
+### Order History
+
+- Allow users to view all past and current ticket purchases
+- Display winning status next to each order where applicable
+- Allow users to click on an individual order to view the ticket details and the winning numbers for that drawing, or indicate if the drawing has not yet occurred
+
+### Winnings & Claims
+
+- Automatically calculate winnings based on how many numbers are matched (5 matched = 100%, 4 = 20%, 3 = 5%, 2 = 1%, 1 or 0 = no prize)
+- Allow users to claim winnings online and deposit directly to their linked PayPal, Venmo, or bank account for prizes under \$600
+- Direct users with prizes of \$600 or more to present their electronic ticket at a local claiming center for in-person verification and IRS reporting
+
+### Winner Notifications
+
+- Notify winning users via email when their ticket contains a winning number
+- Display winning status on the Order History page
+
+### Previous Winning Numbers
+
+- Allow users to browse historical winning numbers for past drawings
+
+### Admin for System Status
+
+- Provide administrators with a dashboard displaying system status, including total tickets sold and total revenue generated
+
+### Admin for Ticket Management
+
+- Allow administrators to view all currently available lottery ticket types
+- Allow administrators to add new lottery ticket types to the platform
+- Allow administrators to remove existing lottery ticket types from the platform
+- Allow administrators to update the ticket price and winning prize amount for any ticket type
+
+## Operating Environment
+
+The Lottery Purchase System (LPS) is a web-based application designed to operate across a broad range of consumer hardware and software environments. The following describes the expected operating environment for both end users and system administrators.
+
+### Client-Side (User & Admin)
+
+- **Hardware:** Any modern device capable of running a web browser, including desktop computers, laptops, tablets, and smartphones. No specialized hardware is required beyond a stable internet connection and a display screen capable of rendering web content
+- **Operating Systems:** The system must function correctly on all major operating systems, including:
+  - Windows 10 and later
+  - macOS 10.15 and later
+  - iOS 14 and later (for mobile users)
+  - Android 10 and later (for mobile users)
+  - Common Linux distributions (e.g., Ubuntu 20.04 and later)
+- **Web Browsers:** The system must be compatible with all major modern browsers, including:
+  - Google Chrome (latest two major versions)
+  - Mozilla Firefox (latest two major versions)
+  - Apple Safari (latest two major versions)
+  - Microsoft Edge (latest two major versions)
+- **Printing Support:** Users who wish to print their electronic tickets must have a printer connected to or accessible from their device, along with the appropriate printer drivers installed on their operating system
+
+### Server-Side
+
+- **Hardware:** The LPS will be hosted on a server infrastructure capable of handling concurrent user sessions with sufficient processing power, memory, and storage
+- **Operating System:** The server environment is expected to run a stable Linux-based OS (e.g., Ubuntu Server 22.04 LTS) or a comparable enterprise server operating system
+- **Database:** The system requires using MySQL 8.0+ as a relational database management system (RDBMS) for storing user account information, ticket data, purchase records, and winning numbers.
+- **Runtime Environment:** The server must support using a Python/Django or Node.js/Express stack as backend programming language and framework, along with all associated runtime dependencies and package managers
+
+### Network & Connectivity
+
+- The system requires a reliable internet connection on the client side for all operations, including registration, login, ticket browsing, purchasing, and order management
+
+### Third-Party Integrations
+
+- The system must interface with external payment provider APIs (PayPal, Venmo, and bank account processing services) for handling purchase transactions and winnings deposits
+- The system must support outbound email functionality via an SMTP server to deliver winner notification emails to users
+
+### Accessibility Environment
+
+- In compliance with the ADA of 1990, the system must be compatible with common assistive technologies, including screen readers (e.g., NVDA, JAWS, VoiceOver) and keyboard-only navigation, across all supported browsers and operating systems
+
+## Design and Implementation Constraints
+
+The following constraints will impact the design and implementation of the platform:
+
+- **Technical Constraints**
+
+- Must be accessible via standard web browsers without special plugins or settings
+- Must finish executing any feature within 4 seconds
+- Must limit memory usage such that the user does not experience slow down on their device
+
+- **Regulatory Constraints**
+
+- Must comply with FCC regulations
+- Must support accessibility standards for users with disabilities according to ADA regulations
+- Must facilitate adherence to IRS regulations by logging relevant information for tax collection purposes
+
+- **Business Constraints**
+
+- Must exclusively accommodate PayPal, Venmo, or a bank account as payment methods
+- Must develop core functionalities in-house rather than relying on external services
+- Must be scalable to accommodate future expansion
+- Must be maintainable by technical staff with appropriate training
+
+- **User Constraints**
+  - Must accommodate users with varying levels of technical proficiency
+- **Security Constraints**
+
+- Must handle encrypted sensitive information like personal information and credit card numbers
+- Must prevent access of sensitive information by unauthorized users
+
+## Assumptions and Dependencies
+
+### Assumptions
+
+- Core functionalities will be developed in-house
+- Adequate infrastructure will be available for system deployment
+- Stakeholders will participate actively in the requirements validation process
+- A reliable email delivery service is available to notify winners
+- ADA and FCC regulations remain consistent throughout the development cycle
+
+### Dependencies
+
+- Availability of accurate and up-to-date data
+- Cooperation from local claiming centers for integration
+- Availability of technical resources for system implementation
+- PayPal, Venmo, and bank accounts' API access that allows for the required transaction security and verification
+
+# Specific Requirements
+
+## External Interface Requirements
+
+### 3.1.1 User Interfaces
+
+The LPS provides a web-based GUI designed for both Users and Administrators. The interface shall be responsive and accessible across desktop and mobile devices while complying with ADA accessibility standards.
+
+The system shall include the following interfaces:
+
+- **Login Page**
+
+- Input fields: Email, Password
+- Buttons: Login, Register
+- Features:
+  - Error message if invalid info
+  - Password masking/unmasking
+
+
+- **Registration Page**
+
+- Input fields: Name, Email, Phone Number, Address, Password
+- Features:
+  - Input validation (e.g., valid email format, password requirements)
+
+
+- **Homepage / Dashboard**
+
+- Navigation menu links to:
+  - Search Bar
+  - Profile
+  - Browse Tickets
+  - Previous Winning Numbers
+  - Order History
+- Always elements:
+  - Logout button
+  - User profile icon
+
+
+
+- **Ticket Browsing Page**
+
+- Displays available lottery tickets
+- Each ticket includes:
+  - Name
+  - Price
+  - Drawing Date
+- Clickable elements to view detailed ticket info
+
+
+
+- **Ticket Details Page**
+
+- Displays:
+  - Ticket name
+  - Price
+  - Prize amount
+  - Drawing date
+- Options:
+  - Auto generate numbers
+  - Manual number selection (5 numbers from 1-50)
+  - Purchase button
+
+
+
+- **Order History Page**
+
+- Displays all purchased tickets
+- Displays:
+  - Ticket numbers
+  - Winning status
+  - Purchase date
+- Allows users to click order to view full details
+
+
+
+- **Profile Page**
+
+- Displays user information
+
+
+- **Admin Dashboard**
+
+- Displays:
+  - Tickets sold
+  - Revenue generated
+- Allows:
+ Update ticket info (e.g., price or prize)
+
+### 3.1.2 Hardware Interfaces
+
+The LPS interacts with the following hardware components:
+
+- **Desktop Computers and Laptops**
+  - Used by users and admin to access the web application
+- **Mobile Devices**
+  - Used for browsing, purchasing, and displaying electronic tickets
+- **Printers**
+  - Used to print electronic tickets
+- **Display Screens**
+  - Used to display digital tickets for scanning at claiming centers
+- **Server Hardware**
+  - Hosts the application, database, and backend services
+
+### 3.1.3 Software Interfaces
+
+| **Software used**     | **Description**                                                               |
+| --------------------- | ----------------------------------------------------------------------------- |
+| Operating System      | Compatible with Windows, macOS, iOS, Android, and Linux                       |
+| Database (MySQL 8.0+) | Stores user data, tickets, transactions, and results                          |
+| Web Browsers          | Google Chrome, Microsoft Edge, Safari, Firefox                                |
+| Backend Framework     | Python (Django) or Node.js (Express) for server-side                          |
+| Frontend Tech         | HTML, CSS, JavaScript, and React                                              |
+| Payment APIs          | Integration with PayPal, Venmo, and bank account                              |
+| Server OS             | Linux-based server (Ubuntu)                                                   |
+| Email Service (SMTP)  | Sends notifications like account confirmation, purchases, and winning alerts. |
+
+The LPS interfaces with several software components and services:
+
+## Functional Requirements
+
+### 3.2.1 User Account Management
+
+F.R.1a: The system **shall** allow new users to register by providing their name, email address, home address, phone number, and a password.
+
+F.R.1b: The system **shall** authenticate registered users via email and password before granting access to purchase or profile features.
+
+F.R.1c: The system **shall** allow users to view and update their personal profile information.
+
+### 3.2.2 Homepage & Navigation
+
+F.R.2a: The system **shall** provide a central homepage for navigating to "Browse Tickets," "Winning Numbers," "User Profile," "Order History," and "Ticket Search."
+
+F.R.2b: The system **shall** restrict guest access; users must be logged in to navigate the platform.
+
+### 3.2.3 Ticket Browsing & Search
+
+F.R.3a: The system **shall** display all available lottery tickets: Power Ball, Mega Millions, Lotto Texas, and Texas Two Step.
+
+F.R.3b: The system **shall** display ticket-specific details, including drawing date, price (\$1.00 - \$2.00), and the current winning prize amount.
+
+F.R.3c: The system **shall** allow users to search for specific tickets by name or type.
+
+F.R.3d: The system **shall** allow users to view previous winning numbers for past drawings.
+
+### 3.2.4 Ticket Purchase & Generation
+
+F.R.4a: The system **shall** allow users to manually select five numbers (1-50) or use an "auto-select" feature for random generation.
+
+F.R.4b: The system **shall** limit a user to a maximum of ten tickets per purchase transaction.
+
+F.R.4c: The system **shall** generate a unique electronic ticket upon successful payment, containing both a ticket number and a confirmation number.
+
+F.R.4d: The system **shall** provide options for the user to print the electronic ticket or display it on a mobile device for scanning.
+
+### 3.2.5 Payment Processing
+
+F.R.5a: The system **shall** process payments exclusively through PayPal, Venmo or a linked bank account.
+
+F.R.5b: The system **shall** encrypt sensitive financial data during transmission and storage.
+
+### 3.2.6 Order History & Winnings
+
+F.R.6a: The system **shall** maintain an "Order History" page displaying all past and current ticket purchases.
+
+F.R.6b: The system **shall** automatically identify winning tickets and display a "Winner" status next to the applicable order.
+
+F.R.6c: The system **shall** display the matching winning numbers and drawing status (e.g., "Pending" or "Drawn") when an order is selected.
+
+F.R.6d: The system **shall** calculate prizes based on the match tiers: 5 matches (100%), 4 (20%), 3 (5%), and 2 (1%).
+
+### 3.2.7 Claims & Notifications
+
+F.R.7a: The system **shall** allow users to claim prizes of \$599 or less online and deposit them directly into their linked payment account.
+
+F.R.7b: For prizes of \$600 or more, the system **shall** direct users to a physical claiming center and facilitate verification and IRS reporting.
+
+F.R.7c: The system **shall** send an automated email notification to users when their ticket is identified as a winner.
+
+### 3.2.8 Administrative Functionality
+
+F.R.8a: The system **shall** provide a dashboard for administrators to view total tickets sold and total revenue generated.
+
+F.R.8b: The system **shall** allow administrators to add, view, or remove lottery ticket types from the platform.
+
+F.R.8c: The system **shall** allow administrators to update the ticket price and the winning prize amount for any specific ticket type.
+
+F.R.8d: The system **shall** provide a user-friendly interface for admin tasks that does not require direct database or file system knowledge.
+
+## Use Case Model
+
+
+\-> **Customer:** The person buying tickets and claiming winnings
+
+\-> **Administrator:** Managing the system and tickets
+
+\-> **External Payment System (PayPal / Venmo/ Bank):** A supporting actor that interacts with the Purchase use case
+
+\-> **Claiming Center:** Verifies tickets for Claim High Value Prize use case
+
+\-> **IRS:** Interacts with the Claim High Value Prize use case
+
+### U1 - Purchase Lottery Ticket
+
+**Summary** - A registered user selects a specific lottery ticket type, chooses five numbers (manually or randomly), and completes the purchase via a supported payment method to receive an electronic ticket.
+
+**Actors** - Customer, External Payment System (PayPal, Venmo, or Bank API)
+
+**Preconditions** \-
+
+1\. The Customer must be registered and logged into the LPS
+
+2\. The Customer must have a valid linked payment method
+
+**Main sequence** - Customer selects "Browse Tickets" from the homepage
+
+\-> Customer selects a ticket type
+
+\-> Customer manually enters five numbers between 1 and 50
+
+\-> Customer specifies the number of tickets (max. 10)
+
+\-> System displays the total cost and prompts for payment
+
+\-> Customer selects a payment method and authorizes the transaction
+
+\-> External Payment System confirms the transaction
+
+\-> System generates a unique electronic ticket and confirmation number
+
+**Alternatives** -
+
+**Alternative 1** (Auto-Select)**:** At step 3, the Customer selects the "Auto-Select" option; the System randomly generates five numbers for the ticket
+
+**Alternative 2** (Payment Failure)**:** At step 7, if the payment is declined, the System notifies the Customer and returns them to the payment selection screen
+
+**Alternative 3** (Limit Exceeded)**:** At step 4, if the user tries to buy more than 10 tickets, the System prevents progress and displays an error message
+
+**Postconditions -**
+
+- The transaction is recorded in the database (of choice)
+- The new ticket appears in the Customer's "Order History"
+- An electronic ticket is ready for printing or digital display
+
+### U2 - Manage Lottery Tickets
+
+**Summary** \- An Administrator adds or removes tickets or updates the price and prize amount of lottery ticket types through a secure interface.
+
+**Actors -** Administrator
+
+**Preconditions** \-
+
+- The user must be logged in with Administrator Privileges/Access
+- The system must be in an active state to accept these changes
+
+**Main sequence** - Admin selects "Manage Tickets" from the Admin Dashboard
+
+\-> System displays the current list of active lottery tickets (Power Ball, Mega Millions, etc.)
+
+\-> Admin selects a specific ticket to modify or selects "Add New Ticket"
+
+\-> Admin inputs or updates the ticket name, price, and the weekly prize amount (of ticket)
+
+\-> Admin saves the changes -> System validates that the ticket follows the 5-number (1-50) rule
+
+\-> System updates the database and reflects changes on the Customer browsing page.
+
+**Alternatives** -
+
+**Alternative 1** (Remove Ticket)**:** At step 3, the admin selects "Remove Ticket." The system prompts confirmation before permanently deleting the ticket type from the active browsing list.
+
+**Alternative 2** (Invalid Data Entry)**:** At step 4, if the Admin enters a price outside the range, or an invalid prize amount, the system displays a validation error and prevents the save.
+
+**Postconditions** \-
+
+- The ticket database is updated with new changes.
+- Audit logs record the Administrator's changes for tracking purposes.
+
+### U3 - Claim Winnings
+
+**Summary** - A registered user can review their ticket status and initiate a claim for their winnings.
+
+**Actors** - Customer, External Payment System (PayPal, Venmo, Bank Account), IRS, Local Claiming Center
+
+**Preconditions** \-
+
+- The User is logged into the website
+- The weekly drawing has happened, and winning numbers have been entered by the System Admin
+
+**Main sequence** - Customer navigates to the "Order History" Page
+
+\-> System identifies winning tickets and displays them accordingly on the page
+
+\-> Customer selects the winning ticket to view ticket details
+
+\-> System determines prize amount:
+
+\-> IF &lt; \$600 -&gt; System prompts Customer to "Claim Online" -> Customer selects linked payment method -> System processes the deposit
+
+\-> ELSE -> redirect to claiming center
+
+**Alternatives** -
+
+**Alternative 1** (High Value Prize >= \$600)**:** At step 4, if the winnings are \$600 or more, the System halts the online claim and displays instructions to visit a Local Claiming Center with the electronic ticket for IRS reporting.
+
+**Alternative 2** (Payment Provider Error)**:** At step 7, if the external payment system is down, the System notifies the user and saves the "Unclaimed" status for a later attempt.
+
+**Postconditions -**
+
+1\. For small prizes, the transaction status is updated to "Claimed" in the database
+
+2\. The Customer's linked account balance is updated via the external payment provider
+
+3\. For prizes over \$600, the system logs that a high-value claim was initiated but requires physical verification
+
+### U4 - User Registration
+
+**Summary** - A new user provides personal details to create an account in the LPS database.
+
+**Actors** - Customer
+
+**Preconditions** \-
+
+- The User is not currently logged into the website or registered.
+
+**Main sequence** - User selects "Register" from the landing page
+
+\-> System prompts for Name, Email, Home Address, Phone Number, and Password
+
+\-> User enters the requested information
+
+\-> System validates that the email is unique, and the password meets security standards -> System records the details in the internal database/ text file.
+
+\-> System confirms successful registration and redirects to the Login page
+
+**Alternatives** -
+
+**Alternative 1** (Duplicate Email)**:** At step 4, if the email exists in database, System displays an error and tells the user to log in instead
+
+**Alternative 2** (Missing Data)**:** If any required field is left blank, the System highlights the field and prevents submission
+
+**Postconditions -**
+
+- A new user record is created in the database.
+
+### U5 - User Login
+
+**Summary** - A registered user authenticates their identity to access protected system features
+
+**Actors** - Customer or Administrator
+
+**Preconditions** \-
+
+The User has an existing record in the LPS database
+
+**Main sequence** - User enters their email (username) and password
+
+\-> System compares credentials against the internal database
+
+\-> System determines if the user is a "Customer" or "Admin"
+
+\-> System grants access to the appropriate Homepage / Dashboard
+
+**Alternatives** -
+
+**Alternative 1 (**Invalid Credentials**):** If the password or email does not match, the System displays "Invalid Login" and denies access.
+
+**Postconditions -**
+
+1\. A secure session is established for the user
+
+### U6 - View System Status Reports
+
+**Summary** - The Administrator views a real-time report of system performance, including ticket sales and total revenue
+
+**Actors** - Administrator
+
+**Preconditions** \-
+
+- The User is logged in with Administrator privileges
+
+**Main sequence** - Admin selects "View System Status" from the Admin Dashboard
+
+\-> System queries the database for total tickets sold and total revenue
+
+\-> System generates a summary report grouped by ticket type (Power Ball, etc.)
+
+\-> System displays the report on the Admin interface
+
+**Alternatives** -
+
+**Alternative 1** (No Sales)**:** If no tickets have been sold for the current period, the System displays "No Data Available" instead of a blank report.
+
+**Postconditions -** The Administrator is informed of the current financial state of the LPS
+
+### U7 - Browse & Search Tickets
+
+**Summary** - A user explores available lottery games and their specific drawing details.
+
+**Actors** - Customer
+
+**Preconditions** \-
+
+- The User is logged in
+
+**Main sequence** - Customer selects "Browse Tickets."
+
+\-> System displays the four ticket types and their current prices.
+
+\-> Customer clicks a specific ticket (e.g., Lotto Texas).
+
+\-> System displays the next drawing date and the winning prize amount
+
+**Alternatives** -
+
+**Alternative 1 (**Search**):** User enters a ticket name in the search bar; the System filters the list to match the query.
+
+**Postconditions -** User is directed to the purchase screen if they select a ticket
+
+### U8 - View Order History
+
+**Summary** - A registered user views their past and current lottery ticket purchases, including ticket details, drawing status, and winning results.
+
+**Actors** - Customer
+
+**Preconditions** \-
+
+- The user has an existing record in the LPS database
+- The user is currently logged in with an active session
+- The user has at least one prior purchase on record
+
+**Main sequence** - Customer navigates to the "Order History" page from the homepage
+
+\-> System retrieves all past and current orders associated with the customer's account
+
+\-> System displays each order with its ticket type, purchase date, selected numbers, and draw date
+
+\-> System checks each order against drawn winning numbers
+
+\-> System displays a winning indicator next to any order with a matching winning number
+
+**Alternatives** -
+
+**Alternative 1** (No Order History): If the customer has no prior purchases, the system displays a message "No Orders Found" and provides a link to the Browse Tickets page.
+
+**Alternative 2** (Winning ticket clicked): If the customer clicks on a winning order, the system displays the ticket details, the winning numbers for that draw, and the prize amount earned.
+
+**Alternative 3** (Draw not yet occurred): If the customer clicks on an order whose draw date has not yet passed, the system displays the ticket details and indicates that the winning numbers are pending.
+
+**Postconditions -**
+
+- The customer's order history is displayed with current winning status reflected for all applicable orders
+- No changes are made to any order or account data as a result of viewing
+
+### U9 - Manage User Profile
+
+**Summary** - A registered user views and updates their personal profile information, such as name, address, phone number, and password.
+
+**Actors** - Customer
+
+**Preconditions** \-
+
+- The User is logged into the system
+- The User has an existing account
+
+**Main sequence** - Customer navigates to the "Profile" page from the homepage
+
+\-> System retrieves and displays the user's current profile information
+
+\-> Customer selects the option to edit profile details
+
+\-> Customer selects the option to edit profile details
+
+\-> Customer updates one or more fields (e.g., name, address, phone number, password)
+
+\-> Customer submits the changes
+
+\-> System validates the updated information
+
+\-> System saves the changes to the database
+
+\-> System displays a confirmation message indicating the update was successful
+
+**Alternatives** -
+
+**Alternative 1** (Invalid Input): At the validation step, if the user enters invalid data (e.g., incorrect phone format or new password doesn't meet requirements), the system displays an error message and prevents submission.
+
+**Alternative 2** (No Changes Made): If the user submits without modifying any fields, the system returns to the profile page without updating.
+
+**Postconditions -**
+
+- The user's profile information is updated in the database
+- The updated information is reflected in future sessions
+
+# Other Non-functional Requirements
+
+## Performance Requirements
+
+### System Performance
+
+The Lottery Purchase System (LPS) is expected to provide responsive, consistent, and scalable performance across all supported platforms and usage conditions.
+
+**N.F.R.1a:**
+
+The system supports completion of all primary user operations, including registration, login, ticket browsing, searching, purchasing, and order history retrieval, within 4 seconds from the time of user action under normal operating conditions.
+
+(Rationale: Ensures acceptable user experience and aligns with the Phase 1 execution constraint.)
+
+**N.F.R.1b:**
+
+The system maintains consistent response times while supporting concurrent users, including multiple users performing ticket purchases simultaneously.
+
+(Rationale: Reflects real-world usage where multiple users interact with the system at the same time.)
+
+**N.F.R.1c:**
+
+The system sustains stable performance during peak usage periods, such as lottery drawing announcements, without increased failure rates or significant response delays.
+
+(Rationale: Peak traffic periods introduce higher load and require consistent system behavior.)
+
+**N.F.R.1d:**
+
+The ticket purchase workflow, including number selection, validation, payment interaction, and ticket generation, completes within the defined response time and executes as a single uninterrupted process.
+
+(Rationale: Prevents duplicate or incomplete transactions while maintaining performance constraints.)
+
+**N.F.R.1e:**
+
+The system generates and displays the electronic ticket, including ticket number and confirmation number, within the same response cycle as the completed purchase.
+
+(Timing relationship: ticket generation occurs before the purchase confirmation is returned to the user.)
+
+**N.F.R.1f:**
+
+The system retrieves user-specific data, including profile information, order history, and ticket details, within the defined response time and reflects the most recent system state.
+
+(Rationale: Users rely on accurate and up-to-date information for verification and decision-
+
+making.)
+
+**N.F.R.1g:**
+
+The system updates winning status in the order history before initiating user notifications and generates email notifications within 5 seconds of updating the winning status.
+
+(Timing relationship: results available → status updated → notification generated)
+
+(Rationale: Ensures consistency between displayed results and notifications while maintaining
+
+timely communication.)
+
+**N.F.R.1h:**
+
+Administrative operations, including system status retrieval and ticket management actions, complete within the defined response time and do not delay or interfere with user-facing
+
+operations.
+
+(Rationale: Prevents administrative tasks from degrading user experience.)
+
+**N.F.R.1i:**
+
+The system processes database read and write operations efficiently such that data access does not introduce delays beyond the defined response time constraints.
+
+(Rationale: Database performance directly impacts overall system responsiveness.)
+
+**N.F.R.1j:**
+
+The system maintains consistent performance across supported devices and platforms, including desktop and mobile environments, without introducing additional latency due to platform
+
+differences.
+
+(Rationale: Ensures uniform user experience across all supported environments.)
+
+## Safety and Security Requirements
+
+The Lottery Purchase System (LPS) includes safety and security requirements to prevent potential loss, damage, or misuse of data and system functionality, and to ensure protection of user information and system integrity.
+
+**N.F.R.2a:**
+
+The system protects user personal information, including name, address, phone number, and account credentials, from unauthorized access, disclosure, or modification through secure storage and controlled access mechanisms.
+
+_(Rationale: The system collects sensitive personal data during registration, requiring protection_
+
+_against data breaches.)_
+
+**N.F.R.2b:**
+
+All communication between client devices and the system is encrypted using secure communication protocols (e.g., HTTPS/TLS) to prevent interception or tampering during data transmission.
+
+_(Rationale: Protects sensitive data such as login credentials and transaction details during_
+
+_network communication.)_
+
+**N.F.R.2c:**
+
+User authentication requires valid email and password credentials before access to protected features such as purchasing tickets, viewing order history, or modifying profile information.
+
+_(Rationale: Ensures that only authorized users can access account-specific functionality.)_
+
+**N.F.R.2d:**
+
+The system enforces role-based access control to restrict administrative functionalities (e.g., ticket management, system status) to authorized administrator accounts only.
+
+_(Rationale: Prevents unauthorized users from accessing or modifying system-level operations.)_
+
+**N.F.R.2e:**
+
+The system validates all user inputs to prevent common web-based attacks, including SQL injection, cross-site scripting (XSS), and unauthorized data manipulation.
+
+_(Rationale: Input validation reduces exposure to common threat vectors targeting web applications.)_
+
+**N.F.R.2f:**
+
+Sensitive financial transactions are processed exclusively through trusted third-party payment providers (e.g., PayPal, Venmo, or bank services), and the system does not store raw payment credentials.
+
+_(Rationale: Reduces risk by delegating payment handling to secure, external services.)_
+
+**N.F.R.2g:**
+
+The system maintains logs of security-relevant events, including login attempts, transaction activity, and administrative actions, to support monitoring and incident detection.
+
+_(Rationale: Logging enables detection of suspicious behavior and supports integration with monitoring tools such as SIEM systems.)_
+
+**N.F.R.2h:**
+
+User sessions are managed securely, including automatic session expiration after a defined period of inactivity and protection against session hijacking.
+
+_(Rationale: Reduces risk of unauthorized access through unattended or compromised sessions.)_
+
+**N.F.R.2i:**
+
+The system ensures integrity of ticket data and transaction records, preventing duplication, alteration, or unauthorized generation of electronic tickets and confirmation numbers.
+
+_(Rationale: Protects against fraud and ensures trust in ticket ownership and winnings claims.)_
+
+**N.F.R.2j:**
+
+The system aligns with recognized security and risk management practices, such as the NIST Cybersecurity Framework, to guide identification, protection, detection, response, and recovery processes.
+
+_(Rationale: Provides a structured approach to managing cybersecurity risks throughout the system lifecycle.)_
+
+**N.F.R.2k:**
+
+The system incorporates basic safeguards against malicious activity, including protection against unauthorized access attempts, abnormal traffic patterns, and potential denial-of-service conditions.
+
+_(Rationale: Enhances system resilience against common external threat actors.)_
+
+# Other Requirements
+
+## 5.1 Legal and Regulatory Requirements
+
+- The system shall comply with the Americans with Disabilities Act (ADA) to ensure accessibility for users with disabilities.
+- The system shall comply with Federal Communications Commission (FCC) accessibility guidelines where applicable.
+- The system shall comply with all federal and state laws governing online lottery systems, including age verification.
+- The system shall ensure that all user data is handled in accordance with applicable data protection and privacy laws.
+- The system shall adhere to Internal Revenue Service (IRS) regulations regarding the reporting of lottery winnings, particularly for prizes of \$600 or more.
+
+## 5.2 Data Retention Requirements
+
+- The system shall retain user account and transaction records for a minimum of two years unless otherwise required by law.
+- The system shall require retained data is stored securely and protected from unauthorized access.
+- The system shall allow administrators to archive or delete data in accordance with retention policies.
+
+## 5.3 Maintainability and Extensibility
+
+- The system shall allow administrators to add, remove, or modify lottery tickets without needing major system changes.
+- The system shall be designed using a modular architecture for maintainability.
+- The system shall include clear documentation to assist future developers and maintainers.
+
+## 5.4 System Logging and Monitoring
+
+- The system shall log user activities, transactions, and administrative actions.
+- Logs shall be used for auditing, debugging, and security monitoring only.
+- The system shall protect log data from unauthorized access or modification.
+
+## 5.5 Backup and Recovery
+
+- The system shall perform automated backups of critical data at regular intervals.
+- The system shall support data recovery in the event of system failure, data corruption, or security breaches.
+- Backup data shall be securely stored separately from the primary system.
+- The system shall allow recovery processes to restore data within an acceptable timeframe.
+
+Appendix A - Group Log
+
+**Joanna Chimalilo <jchimali@ttu.edu>**
+
+**Work done: Functional Requirements, Use Cases, Section 3**
+
+**Contribution Percentage: 100%**
+
+**Janice Kennedy <janikenn@ttu.edu>**
+
+**Work done: Use Case Model, Context Diagram, Section 2.1 - 2.3**
+
+**Contribution Percentage: 100%**
+
+**Starlika Bauskar <sbauskar@ttu.edu>**
+
+**Work done: Context Diagram, Section 2.4 - 2.5**
+
+**Contribution Percentage: 100%**
+
+**Eshan Lal Shrestha <esshrest@ttu.edu>**
+
+**Work done: Non-Functional Requirements, Use Case Model, User Interface**
+
+**Contribution Percentage: 100%**
+
+**Brandt Schmidt <brandtsc@ttu.edu>**
+
+**Work done: Section 1, Section 5, Helped with 3.1-3. Formatting.**
+
+**Contribution Percentage: 100%**

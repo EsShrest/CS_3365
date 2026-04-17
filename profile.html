@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoPlay - Profile</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🎰 LottoPlay</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="browse-tickets.html">Browse Tickets</a></li>
+                <li><a href="order-history.html">Order History</a></li>
+            </ul>
+            <div class="user-menu">
+                <a href="profile.html" style="text-decoration: none; color: var(--text-primary);">
+                    <div class="user-icon">👤</div>
+                </a>
+                <a href="index.html" class="btn btn-danger">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">My Profile</h2>
+
+        <div class="grid grid-2">
+            <!-- Profile Info Card -->
+            <div class="card">
+                <div class="card-body">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div style="width: 100px; height: 100px; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                            👤
+                        </div>
+                        <h2 id="profile-header-name">User</h2>
+                        <p class="text-muted">Member since May 2026</p>
+                    </div>
+
+                    <div style="padding: 1rem; background-color: var(--tertiary-dark); border-radius: 4px; margin-bottom: 1.5rem;">
+                        <div class="stat-item">
+                            <div class="stat-value" id="profile-tickets">0</div>
+                            <div class="stat-label">Tickets Purchased</div>
+                        </div>
+                        <div style="margin: 1rem 0;"></div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="profile-wins">0</div>
+                            <div class="stat-label">Winning Tickets</div>
+                        </div>
+                        <div style="margin: 1rem 0;"></div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="profile-winnings">$0.00</div>
+                            <div class="stat-label">Total Winnings</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%;" onclick="openModal('edit-profile-modal')">Edit Profile</button>
+                </div>
+            </div>
+
+            <!-- Account Details -->
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="mb-3">Account Information</h3>
+
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profile-name" value="" disabled style="cursor: not-allowed; opacity: 0.7;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="profile-email" value="" disabled style="cursor: not-allowed; opacity: 0.7;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="profile-phone" value="" disabled style="cursor: not-allowed; opacity: 0.7;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea id="profile-address" disabled style="cursor: not-allowed; opacity: 0.7;"></textarea>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="openModal('security-modal')" style="width: 100%;">Security Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Activity -->
+        <section style="margin-top: 2rem;">
+            <h3 class="section-title">Recent Activity</h3>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
+                        <div>
+                            <p><strong>Logged in</strong></p>
+                            <p class="text-muted">May 2, 2026 at 3:00 PM</p>
+                        </div>
+                        <p class="text-muted">Chrome on Windows</p>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
+                        <div>
+                            <p><strong>Purchased ticket</strong></p>
+                            <p class="text-muted">May 1, 2026 at 10:30 AM</p>
+                        </div>
+                        <p class="text-muted">Mega Lottery - $5.00</p>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border-color);">
+                        <div>
+                            <p><strong>Password changed</strong></p>
+                            <p class="text-muted">April 28, 2026 at 2:15 PM</p>
+                        </div>
+                        <p class="text-muted">Chrome on Windows</p>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; padding: 1rem 0;">
+                        <div>
+                            <p><strong>Account created</strong></p>
+                            <p class="text-muted">April 20, 2026 at 8:00 AM</p>
+                        </div>
+                        <p class="text-muted">Firefox on Windows</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Delete Account -->
+        <section style="margin-top: 2rem;">
+            <div class="card" style="border-left: 3px solid var(--error-color);">
+                <div class="card-body">
+                    <h3 style="color: var(--error-color); margin-bottom: 0.5rem;">Danger Zone</h3>
+                    <p class="text-muted mb-3">Once you delete your account, there is no going back. Please be certain.</p>
+                    <button class="btn btn-danger" onclick="if(confirm('Are you sure? This action cannot be undone.')) { showAlert('Account deletion requested', 'error'); }">Delete Account</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeModal('edit-profile-modal')">&times;</span>
+            <h2 class="mb-3">Edit Profile</h2>
+            
+            <form>
+                <div class="form-group">
+                    <label for="edit-name">Full Name</label>
+                    <input type="text" id="edit-name" value="" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-email">Email Address</label>
+                    <input type="email" id="edit-email" value="" required disabled>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-phone">Phone Number</label>
+                    <input type="tel" id="edit-phone" value="" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-address">Address</label>
+                    <textarea id="edit-address" rows="3" required></textarea>
+                </div>
+
+                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="saveProfile()">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Security Settings Modal -->
+    <div id="security-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="closeModal('security-modal')">&times;</span>
+            <h2 class="mb-3">Security Settings</h2>
+            
+            <div class="form-group">
+                <label class="mb-2">Two-Factor Authentication</label>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="text-muted">Protect your account with 2FA</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin: 2rem 0;"></div>
+
+            <h3 class="mb-2">Change Password</h3>
+            <div class="form-group">
+                <label for="current-password">Current Password</label>
+                <input type="password" id="current-password" placeholder="Enter current password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="new-password">New Password</label>
+                <input type="password" id="new-password" placeholder="Enter new password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-new-password">Confirm New Password</label>
+                <input type="password" id="confirm-new-password" placeholder="Confirm new password" required>
+            </div>
+
+            <button type="button" class="btn btn-primary" style="width: 100%;" 
+                    onclick="showAlert('Password changed successfully', 'success'); closeModal('security-modal');">
+                Update Password
+            </button>
+
+            <div style="margin: 2rem 0;"></div>
+
+            <h3 class="mb-2">Active Sessions</h3>
+            <div style="padding: 1rem; background-color: var(--tertiary-dark); border-radius: 4px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <p><strong>Chrome on Windows</strong></p>
+                    <button class="btn btn-danger" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">Sign Out</button>
+                </div>
+                <p class="text-muted" style="font-size: 0.9rem;">Current session • Last active just now</p>
+            </div>
+
+            <div style="padding: 1rem; background-color: var(--tertiary-dark); border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <p><strong>Firefox on Windows</strong></p>
+                    <button class="btn btn-danger" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">Sign Out</button>
+                </div>
+                <p class="text-muted" style="font-size: 0.9rem;">Last active May 1, 2026</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

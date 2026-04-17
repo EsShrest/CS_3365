@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoPlay - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🎰 LottoPlay</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="browse-tickets.html">Browse Tickets</a></li>
+                <li><a href="#" onclick="openModal('search-modal')">Search</a></li>
+                <li><a href="order-history.html">Order History</a></li>
+                <li><a href="#" onclick="openModal('previous-winners-modal')">Previous Winners</a></li>
+            </ul>
+            <div class="user-menu">
+                <a href="profile.html" style="text-decoration: none; color: var(--text-primary);">
+                    <div class="user-icon">👤</div>
+                </a>
+                <a href="index.html" class="btn btn-danger">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Featured Section -->
+        <section class="featured-section">
+            <h1 class="featured-title" id="dashboard-welcome">Welcome, Player!</h1>
+            <p class="featured-description">Today's Jackpot: <span style="color: var(--accent-green); font-size: 1.3rem;">$50,000,000</span></p>
+            <a href="browse-tickets.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">Start Playing Now</a>
+        </section>
+
+        <!-- Stats Section -->
+        <section>
+            <h2 class="section-title">Your Stats</h2>
+            <div class="stats">
+                <div class="stat-item card-body">
+                    <div class="stat-value" id="dash-spent">$0.00</div>
+                    <div class="stat-label">Total Spent</div>
+                </div>
+                <div class="stat-item card-body">
+                    <div class="stat-value" id="dash-tickets">0</div>
+                    <div class="stat-label">Tickets Purchased</div>
+                </div>
+                <div class="stat-item card-body">
+                    <div class="stat-value" id="dash-winnings">$0.00</div>
+                    <div class="stat-label">Total Winnings</div>
+                </div>
+                <div class="stat-item card-body">
+                    <div class="stat-value" id="dash-wins">0</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Tickets Section -->
+        <section>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 class="section-title">Recent Purchases</h2>
+                <a href="order-history.html" class="btn btn-secondary">View All</a>
+            </div>
+
+            <div class="grid grid-4">
+                <div class="card ticket-card">
+                    <div class="ticket-image">🎟️</div>
+                    <div class="card-body">
+                        <h3>Mega Lottery</h3>
+                        <p class="text-muted">Drawing: May 15, 2026</p>
+                        <div class="ticket-price mt-2">$5.00</div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+
+                <div class="card ticket-card">
+                    <div class="ticket-image">⭐</div>
+                    <div class="card-body">
+                        <h3>Lucky Draw</h3>
+                        <p class="text-muted">Drawing: June 1, 2026</p>
+                        <div class="ticket-price mt-2">$2.00</div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+
+                <div class="card ticket-card">
+                    <div class="ticket-image">💎</div>
+                    <div class="card-body">
+                        <h3>Premium Draw</h3>
+                        <p class="text-muted">Drawing: June 10, 2026</p>
+                        <div class="ticket-price mt-2">$10.00</div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+
+                <div class="card ticket-card">
+                    <div class="ticket-image">🏆</div>
+                    <div class="card-body">
+                        <h3>Grand Prize</h3>
+                        <p class="text-muted">Drawing: June 20, 2026</p>
+                        <div class="ticket-price mt-2">$15.00</div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Tickets -->
+        <section>
+            <h2 class="section-title">Featured Tickets</h2>
+            <div class="grid grid-2">
+                <div class="card">
+                    <div style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange)); height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <h2 style="font-size: 2rem;">🎰</h2>
+                    </div>
+                    <div class="card-body">
+                        <h3>Daily Jackpot</h3>
+                        <p class="text-muted mb-2">New drawings every day at 8 PM</p>
+                        <div style="margin: 1rem 0;">
+                            <span style="color: var(--accent-green); font-weight: bold;">Prize Pool: $100,000</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;">Buy Tickets Now</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="background: linear-gradient(135deg, var(--accent-green), var(--accent-purple)); height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <h2 style="font-size: 2rem;">🌟</h2>
+                    </div>
+                    <div class="card-body">
+                        <h3>Weekly Mega Draw</h3>
+                        <p class="text-muted mb-2">Biggest prizes every Friday</p>
+                        <div style="margin: 1rem 0;">
+                            <span style="color: var(--accent-green); font-weight: bold;">Prize Pool: $1,000,000</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;">Buy Tickets Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('search-modal')">&times;</span>
+            <h2 class="mb-3">Search Tickets</h2>
+            <div class="form-group">
+                <input type="text" placeholder="Search by ticket name, prize, or date..." style="width: 100%; padding: 0.75rem;">
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Previous Winners Modal -->
+    <div id="previous-winners-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('previous-winners-modal')">&times;</span>
+            <h2 class="mb-3">Previous Winning Numbers</h2>
+            <div class="card-body">
+                <div style="margin-bottom: 1.5rem;">
+                    <h4>Mega Lottery - May 8, 2026</h4>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <span style="background: var(--accent-green); color: #000; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">12</span>
+                        <span style="background: var(--accent-green); color: #000; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">28</span>
+                        <span style="background: var(--accent-green); color: #000; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">35</span>
+                        <span style="background: var(--accent-green); color: #000; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">41</span>
+                        <span style="background: var(--accent-green); color: #000; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">47</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h4>Lucky Draw - May 1, 2026</h4>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <span style="background: var(--accent-purple); color: #fff; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">5</span>
+                        <span style="background: var(--accent-purple); color: #fff; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">14</span>
+                        <span style="background: var(--accent-purple); color: #fff; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">22</span>
+                        <span style="background: var(--accent-purple); color: #fff; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">31</span>
+                        <span style="background: var(--accent-purple); color: #fff; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">48</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

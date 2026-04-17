@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoPlay - Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🎰 LottoPlay</div>
+            <div class="user-menu">
+                <a href="register.html" class="btn btn-secondary">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-sm">
+        <section>
+            <div class="featured-section text-center">
+                <h1 class="featured-title">Welcome Back</h1>
+                <p class="featured-description">Sign in to your LottoPlay account to purchase tickets and check your winning numbers</p>
+            </div>
+
+            <div class="form-container">
+                <h2 class="text-center mb-4">Login</h2>
+                
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div style="position: relative; display: flex;">
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required style="flex: 1;">
+                            <button type="button" id="password-toggle" onclick="togglePasswordVisibility('password', 'password-toggle')" 
+                                    style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0 0.5rem;">👁️</button>
+                        </div>
+                    </div>
+
+                    <div style="text-align: right; margin-bottom: 1.5rem;">
+                        <a href="#" onclick="openModal('forgot-password-modal')" style="color: var(--accent-green); text-decoration: none;">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Login</button>
+                </form>
+
+                <div style="text-align: center; color: var(--text-secondary);">
+                    Don't have an account? <a href="register.html" style="color: var(--accent-green); text-decoration: none;">Register here</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('forgot-password-modal')">&times;</span>
+            <h2 class="mb-3">Forgot Password</h2>
+            <form>
+                <div class="form-group">
+                    <label for="reset-email">Enter your email address</label>
+                    <input type="email" id="reset-email" placeholder="your@email.com" required>
+                </div>
+                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="showAlert('Password reset link sent to your email', 'success'); closeModal('forgot-password-modal');">Send Reset Link</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
