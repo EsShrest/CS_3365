@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# IDE
+.vs/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Documents
+Take2.docx
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
