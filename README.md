@@ -4,7 +4,7 @@ Minimal local prototype based on the SRS.
 
 ## Demo Stack
 - Backend: Node.js + Express
-- Database: SQLite (local file in `data/lps.sqlite`)
+- Database: MySQL 8+ (local instance)
 - Auth: basic email/password + in-memory session token
 - Payments: mocked and logged in `logs/payments.log`
 - Email: fake log-based notifications in `logs/email.log`
@@ -25,19 +25,23 @@ Minimal local prototype based on the SRS.
 ## Run Locally
 1. Install dependencies:
    - `npm install`
-2. Start the app:
+2. Ensure MySQL is running and create a local database (or let the app create it):
+  - Default DB name: `lps_demo`
+  - Connection defaults: `localhost:3306` with user `root` and empty password
+  - Override with env vars: `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`
+3. Start the app:
    - `npm start`
-3. Open:
+4. Open:
    - `http://localhost:3000`
 
 ## Demo Accounts
 - Admin account (seeded):
   - Email: `admin@lps.local`
-  - Password: ` 
+  - Password: `admin123`
 - User account:
   - Create from `register.html`
 
 ## Notes
 - This is a demo prototype, not production-secure.
 - Sessions are in-memory and reset on server restart.
-- SQLite data persists in `data/lps.sqlite`.
+- MySQL data persists in your local database.

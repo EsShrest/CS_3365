@@ -1,5 +1,5 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const mysql = require('mysql2/promise');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -7,53 +7,39 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 3000;
 
-const dataDir = path.join(__dirname, 'data');
 const logsDir = path.join(__dirname, 'logs');
-fs.mkdirSync(dataDir, { recursive: true });
 fs.mkdirSync(logsDir, { recursive: true });
 
-const dbPath = path.join(dataDir, 'lps.sqlite');
-const db = new sqlite3.Database(dbPath);
+const dbConfig = {
+  host: process.env.MYSQL_HOST || 'localhost',
+  user: process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || 'root',
+  port: Number(process.env.MYSQL_PORT || 3306),
+};
+
+const dbNameRaw = process.env.MYSQL_DATABASE || 'lps_demo';
+const dbName = /^[A-Za-z0-9_]+$/.test(dbNameRaw) ? dbNameRaw : 'lps_demo';
+
+let db;
 
 app.use(express.json());
 app.use(express.static(__dirname));
 
 const sessions = new Map();
 
-function run(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function onRun(err) {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(this);
-    });
-  });
+async function run(sql, params = []) {
+  const [result] = await db.execute(sql, params);
+  return result;
 }
 
-function get(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(row);
-    });
-  });
+async function get(sql, params = []) {
+  const [rows] = await db.execute(sql, params);
+  return rows[0];
 }
 
-function all(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(rows);
-    });
-  });
+async function all(sql, params = []) {
+  const [rows] = await db.execute(sql, params);
+  return rows;
 }
 
 function hashPassword(password) {
@@ -144,45 +130,64 @@ function adminOnly(req, res, next) {
 }
 
 async function initDb() {
+  const bootstrap = await mysql.createPool({
+    host: dbConfig.host,
+    user: dbConfig.user,
+    password: dbConfig.password,
+    port: dbConfig.port,
+  });
+
+  await bootstrap.execute(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
+  await bootstrap.end();
+
+  db = mysql.createPool({
+    host: dbConfig.host,
+    user: dbConfig.user,
+    password: dbConfig.password,
+    port: dbConfig.port,
+    database: dbName,
+    connectionLimit: 10,
+  });
+
   await run(`
     CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      phone TEXT NOT NULL,
-      address TEXT NOT NULL,
-      password_hash TEXT NOT NULL,
-      is_admin INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(120) NOT NULL,
+      email VARCHAR(255) NOT NULL UNIQUE,
+      phone VARCHAR(50) NOT NULL,
+      address VARCHAR(255) NOT NULL,
+      password_hash VARCHAR(255) NOT NULL,
+      is_admin TINYINT(1) NOT NULL DEFAULT 0,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
   await run(`
     CREATE TABLE IF NOT EXISTS games (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL UNIQUE,
-      price REAL NOT NULL,
-      prize_amount REAL NOT NULL,
-      drawing_date TEXT NOT NULL,
-      active INTEGER NOT NULL DEFAULT 1
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(120) NOT NULL UNIQUE,
+      price DECIMAL(10, 2) NOT NULL,
+      prize_amount DECIMAL(12, 2) NOT NULL,
+      drawing_date DATE NOT NULL,
+      active TINYINT(1) NOT NULL DEFAULT 1
     )
   `);
 
   await run(`
     CREATE TABLE IF NOT EXISTS tickets (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      game_id INTEGER NOT NULL,
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      game_id INT NOT NULL,
       numbers_json TEXT NOT NULL,
-      purchase_total REAL NOT NULL,
-      payment_method TEXT NOT NULL,
-      payment_status TEXT NOT NULL,
-      status TEXT NOT NULL,
+      purchase_total DECIMAL(10, 2) NOT NULL,
+      payment_method VARCHAR(20) NOT NULL,
+      payment_status VARCHAR(20) NOT NULL,
+      status VARCHAR(20) NOT NULL,
       winning_numbers_json TEXT,
-      matches INTEGER DEFAULT 0,
-      payout REAL DEFAULT 0,
-      confirmation_code TEXT NOT NULL,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      matches INT DEFAULT 0,
+      payout DECIMAL(12, 2) DEFAULT 0,
+      confirmation_code VARCHAR(60) NOT NULL,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(user_id) REFERENCES users(id),
       FOREIGN KEY(game_id) REFERENCES games(id)
     )
@@ -203,8 +208,10 @@ async function initDb() {
   if (!adminUser) {
     await run(
       'INSERT INTO users (name, email, phone, address, password_hash, is_admin) VALUES (?, ?, ?, ?, ?, 1)',
-      ['Demo Admin', 'admin@lps.local', '0000000000', 'Admin Office', hashPassword('Admin123!')]
+      ['Demo Admin', 'admin@lps.local', '0000000000', 'Admin Office', hashPassword('admin123')]
     );
+  } else {
+    await run('UPDATE users SET password_hash = ?, is_admin = 1 WHERE id = ?', [hashPassword('admin123'), adminUser.id]);
   }
 }
 

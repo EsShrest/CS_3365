@@ -11,24 +11,22 @@ The LPS is a full-stack **Lottery Ticket Purchase & Management System** built wi
 ### Technology Stack
 - **Runtime**: Node.js (async event-driven)
 - **Framework**: Express.js (REST API)
-- **Database**: SQLite (file-based, local persistence)
+- **Database**: MySQL 8.0+ (local instance)
 - **Frontend**: Vanilla JavaScript + HTML/CSS
 - **Authentication**: Bearer token + in-memory sessions
 - **Cryptography**: Node.js built-in `crypto` module
 
-### Design Pattern: Promise-Based Async
+## Design Pattern: Promise-Based Async
 
-The project uses **async/await** with custom promise wrappers around SQLite callbacks:
+The project uses **async/await** with a MySQL connection pool powered by `mysql2/promise`:
 
 ```javascript
-// SQLite3 uses callbacks, so they're wrapped in Promises
-function get(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) reject(err);
-      resolve(row);
-    });
-  });
+const mysql = require('mysql2/promise');
+const db = mysql.createPool({ host, user, password, database });
+
+async function get(sql, params = []) {
+  const [rows] = await db.execute(sql, params);
+  return rows[0];
 }
 
 // This enables async/await syntax in endpoints
@@ -38,7 +36,7 @@ async function authMiddleware(req, res, next) {
 }
 ```
 
-**Why?** Converts callback-based SQLite3 API to modern promise chains, enabling cleaner `async/await` code and proper error handling with try/catch.
+**Why?** Uses the native promise API to keep database access clean, consistent, and compatible with `async/await`.
 
 ---
 
@@ -47,14 +45,14 @@ async function authMiddleware(req, res, next) {
 ### 1. Users Table
 ```sql
 CREATE TABLE users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
-  phone TEXT NOT NULL,
-  address TEXT NOT NULL,
-  password_hash TEXT NOT NULL,          -- Scrypt hash with salt
-  is_admin INTEGER NOT NULL DEFAULT 0,  -- Role flag
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  phone VARCHAR(50) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,  -- Scrypt hash with salt
+  is_admin TINYINT(1) NOT NULL DEFAULT 0,  -- Role flag
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 )
 ```
 
@@ -67,12 +65,12 @@ CREATE TABLE users (
 ### 2. Games Table
 ```sql
 CREATE TABLE games (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL UNIQUE,
-  price REAL NOT NULL,
-  prize_amount REAL NOT NULL,
-  drawing_date TEXT NOT NULL,
-  active INTEGER NOT NULL DEFAULT 1    -- Soft delete flag
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL UNIQUE,
+  price DECIMAL(10, 2) NOT NULL,
+  prize_amount DECIMAL(12, 2) NOT NULL,
+  drawing_date DATE NOT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1    -- Soft delete flag
 )
 ```
 
@@ -84,19 +82,19 @@ CREATE TABLE games (
 ### 3. Tickets Table
 ```sql
 CREATE TABLE tickets (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  game_id INTEGER NOT NULL,
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  game_id INT NOT NULL,
   numbers_json TEXT NOT NULL,           -- [1,5,12,33,50] as JSON string
-  purchase_total REAL NOT NULL,
-  payment_method TEXT NOT NULL,         -- 'paypal', 'venmo', 'bank'
-  payment_status TEXT NOT NULL,         -- 'paid' (always for mock)
-  status TEXT NOT NULL,                 -- 'pending', 'won', 'lost'
+  purchase_total DECIMAL(10, 2) NOT NULL,
+  payment_method VARCHAR(20) NOT NULL,  -- 'paypal', 'venmo', 'bank'
+  payment_status VARCHAR(20) NOT NULL,  -- 'paid' (always for mock)
+  status VARCHAR(20) NOT NULL,          -- 'pending', 'won', 'lost'
   winning_numbers_json TEXT,            -- [2,6,15,40,48] or NULL if pending
-  matches INTEGER DEFAULT 0,            -- Count of matching numbers
-  payout REAL DEFAULT 0,                -- Calculated payout
-  confirmation_code TEXT NOT NULL,      -- CNF-timestamp-random
-  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  matches INT DEFAULT 0,                -- Count of matching numbers
+  payout DECIMAL(12, 2) DEFAULT 0,       -- Calculated payout
+  confirmation_code VARCHAR(60) NOT NULL, -- CNF-timestamp-random
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(user_id) REFERENCES users(id),
   FOREIGN KEY(game_id) REFERENCES games(id)
 )
@@ -260,7 +258,7 @@ const user = await get(`SELECT * FROM users WHERE email = '${email}'`);
 ```
 
 **Why?**
-- SQLite3 client separates SQL structure from data
+- MySQL client separates SQL structure from data
 - `?` placeholders are replaced safely
 - Data never parsed as SQL code
 - Prevents injection like `email = "admin'--"` from breaking query logic
@@ -455,7 +453,7 @@ if (!allowedMethods.includes(paymentMethod)) {
 
 ### 5. Data Persistence & Integrity
 
-#### SQLite Foreign Keys & Constraints
+#### MySQL Foreign Keys & Constraints
 ```sql
 FOREIGN KEY(user_id) REFERENCES users(id),
 FOREIGN KEY(game_id) REFERENCES games(id)
@@ -468,7 +466,7 @@ FOREIGN KEY(game_id) REFERENCES games(id)
 
 #### Database Transactions (Implicit)
 ```javascript
-// SQLite3 auto-commits individual statements
+// MySQL auto-commits individual statements
 // For demo purposes, okay; production would batch operations in explicit transactions
 ```
 
