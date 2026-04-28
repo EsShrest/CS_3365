@@ -38,7 +38,11 @@ Minimal local prototype based on the SRS.
 - Admin account (seeded):
   - Email: `admin@lps.local`
   - Password: `admin123`
-- User account:
+- Test user account (seeded with sample transactions):
+  - Email: `john@example.com`
+  - Password: `Password123`
+  - Pre-populated with 4 sample transactions for testing
+- Additional user accounts:
   - Create from `register.html`
 
 ## Notes

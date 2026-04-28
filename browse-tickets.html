@@ -13,6 +13,7 @@
             <ul class="nav-links">
                 <li><a href="dashboard.html">Home</a></li>
                 <li><a href="browse-tickets.html">Browse Tickets</a></li>
+                <li><a href="winning-numbers.html">Winning Numbers</a></li>
                 <li><a href="order-history.html">Order History</a></li>
             </ul>
             <div class="user-menu">
@@ -25,29 +26,16 @@
     </header>
 
     <div class="container">
-        <!-- Search and Filter -->
         <section class="mb-4">
             <h2 class="section-title">Browse Tickets</h2>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                <div class="search-bar">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" placeholder="Search tickets...">
+            <p class="text-muted">Choose a game to view details and purchase tickets.</p>
+            <div class="card" style="margin-top: 1.5rem;">
+                <div class="card-body">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="ticket-search-input">Search by ticket name</label>
+                        <input type="text" id="ticket-search-input" placeholder="Search tickets...">
+                    </div>
                 </div>
-                
-                <select style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;">
-                    <option>All Prices</option>
-                    <option>Under $5</option>
-                    <option>$5 - $10</option>
-                    <option>Over $10</option>
-                </select>
-
-                <select style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;">
-                    <option>All Dates</option>
-                    <option>This Week</option>
-                    <option>This Month</option>
-                    <option>Next Month</option>
-                </select>
             </div>
         </section>
 

@@ -13,6 +13,7 @@
             <ul class="nav-links">
                 <li><a href="dashboard.html">Home</a></li>
                 <li><a href="browse-tickets.html">Browse Tickets</a></li>
+                <li><a href="winning-numbers.html">Winning Numbers</a></li>
                 <li><a href="order-history.html">Order History</a></li>
             </ul>
             <div class="user-menu">
@@ -27,28 +28,7 @@
     <div class="container">
         <h2 class="section-title">Order History</h2>
 
-        <!-- Filter Section -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-            <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" placeholder="Search orders...">
-            </div>
-            
-            <select style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;">
-                <option>All Status</option>
-                <option>All Orders</option>
-                <option>Won</option>
-                <option>Pending</option>
-                <option>Lost</option>
-            </select>
-
-            <select style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px;">
-                <option>All Time</option>
-                <option>Last 7 Days</option>
-                <option>Last Month</option>
-                <option>Last Year</option>
-            </select>
-        </div>
+        <p class="text-muted" style="margin-bottom: 2rem;">Track ticket status, payouts, and draw dates in one place.</p>
 
         <!-- Orders Table -->
         <section>
@@ -76,6 +56,17 @@
                 </div>
             </div>
         </section>
+
+        <!-- Order Details Modal -->
+        <div id="order-details-modal" class="modal">
+            <div class="modal-content" style="max-width: 800px;">
+                <span class="close-btn" onclick="closeModal('order-details-modal')">&times;</span>
+                <h2 class="mb-3">Ticket Details</h2>
+                <div id="order-details-body">
+                    <p class="text-muted">Loading ticket details...</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Stats -->
         <section style="margin-top: 2rem;">

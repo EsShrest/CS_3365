@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LottoPlay - Winning Numbers</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🎰 LottoPlay</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="browse-tickets.html">Browse Tickets</a></li>
+                <li><a href="winning-numbers.html">Winning Numbers</a></li>
+                <li><a href="order-history.html">Order History</a></li>
+            </ul>
+            <div class="user-menu">
+                <a href="profile.html" style="text-decoration: none; color: var(--text-primary);">
+                    <div class="user-icon">👤</div>
+                </a>
+                <a href="index.html" class="btn btn-danger">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Previous Winning Numbers</h2>
+        <p class="text-muted" style="margin-bottom: 2rem;">View winning numbers from recent drawings across all games.</p>
+
+        <div class="card">
+            <div class="card-body" style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color);">
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Game</th>
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Draw Date</th>
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Winning Numbers</th>
+                        </tr>
+                    </thead>
+                    <tbody id="winning-numbers-body">
+                        <tr>
+                            <td colspan="3" style="padding: 1rem;">Loading winning numbers...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

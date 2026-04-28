@@ -13,8 +13,6 @@
             <ul class="nav-links">
                 <li><a href="admin-dashboard.html">Dashboard</a></li>
                 <li><a href="admin-tickets.html">Manage Tickets</a></li>
-                <li><a href="#" onclick="alert('Analytics')">Analytics</a></li>
-                <li><a href="#" onclick="alert('Users')">Users</a></li>
             </ul>
             <div class="user-menu">
                 <span class="text-muted">Admin</span>
@@ -65,7 +63,6 @@
         <section>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h3 class="section-title" style="margin-bottom: 0;">All Tickets</h3>
-                <input type="text" placeholder="Search tickets..." style="padding: 0.75rem 1rem; background-color: var(--tertiary-dark); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; width: 200px;">
             </div>
 
             <div class="card">
@@ -89,39 +86,6 @@
             </div>
         </section>
 
-        <!-- Ticket Statistics -->
-        <section style="margin-top: 2rem;">
-            <h3 class="section-title">Ticket Statistics</h3>
-            <div class="grid grid-4">
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-muted mb-2">Active Tickets</p>
-                        <div class="stat-value">8</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-muted mb-2">Total Sales</p>
-                        <div class="stat-value">3,842</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-muted mb-2">Total Revenue</p>
-                        <div class="stat-value">$125.4K</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-muted mb-2">Avg Sale Value</p>
-                        <div class="stat-value">$32.65</div>
-                    </div>
-                </div>
-            </div>
-        </section>
     </div>
 
     <!-- Edit Ticket Modal -->
@@ -151,7 +115,7 @@
                 </div>
 
                 <button type="button" class="btn btn-primary" style="width: 100%;" 
-                        onclick="showAlert('Ticket updated successfully', 'success'); closeModal('edit-ticket-modal');">
+                        onclick="updateTicket()">
                     Update Ticket
                 </button>
             </form>

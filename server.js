@@ -193,6 +193,33 @@ async function initDb() {
     )
   `);
 
+  await run(`
+    CREATE TABLE IF NOT EXISTS winning_numbers (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      game_id INT NOT NULL,
+      draw_date DATE NOT NULL,
+      numbers_json TEXT NOT NULL,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(game_id) REFERENCES games(id)
+    )
+  `);
+
+  try {
+    await run('ALTER TABLE tickets ADD COLUMN claim_status VARCHAR(20) NOT NULL DEFAULT "unclaimed"');
+  } catch (error) {
+    if (error.code !== 'ER_DUP_FIELDNAME') {
+      throw error;
+    }
+  }
+
+  try {
+    await run('ALTER TABLE tickets ADD COLUMN claimed_at DATETIME NULL');
+  } catch (error) {
+    if (error.code !== 'ER_DUP_FIELDNAME') {
+      throw error;
+    }
+  }
+
   const gameCount = await get('SELECT COUNT(*) AS count FROM games');
   if (gameCount.count === 0) {
     await run(
@@ -212,6 +239,85 @@ async function initDb() {
     );
   } else {
     await run('UPDATE users SET password_hash = ?, is_admin = 1 WHERE id = ?', [hashPassword('admin123'), adminUser.id]);
+  }
+
+  // Add test user (John Doe) with fake transactions
+  let johnDoeUser = await get('SELECT id FROM users WHERE email = ?', ['john@example.com']);
+  if (!johnDoeUser) {
+    const result = await run(
+      'INSERT INTO users (name, email, phone, address, password_hash, is_admin) VALUES (?, ?, ?, ?, ?, 0)',
+      ['John Doe', 'john@example.com', '5551234567', '123 Main St, Austin, TX 78701', hashPassword('Password123')]
+    );
+    johnDoeUser = result;
+  }
+
+  // Add fake transactions for John Doe
+  const johnTransactions = await all('SELECT id FROM tickets WHERE user_id = ?', [johnDoeUser.insertId || johnDoeUser.id || 2]);
+  const johnId = johnDoeUser.insertId || johnDoeUser.id || 2;
+  
+  if (johnTransactions.length === 0) {
+    // Get game IDs
+    const games = await all('SELECT id FROM games LIMIT 4');
+    
+    if (games.length > 0) {
+      const fakeTransactions = [
+        {
+          gameId: games[0].id,
+          numbers: [7, 14, 21, 35, 42],
+          payment: 'Credit Card',
+          status: 'pending',
+          total: 2.00
+        },
+        {
+          gameId: games[1].id,
+          numbers: [5, 15, 25, 35, 45],
+          payment: 'PayPal',
+          status: 'completed',
+          total: 2.00
+        },
+        {
+          gameId: games[2].id,
+          numbers: [3, 9, 17, 33, 48],
+          payment: 'Venmo',
+          status: 'completed',
+          total: 1.00
+        },
+        {
+          gameId: games[3].id,
+          numbers: [2, 8, 16, 24, 40],
+          payment: 'Bank Transfer',
+          status: 'won',
+          total: 1.00
+        }
+      ];
+      
+      for (const trans of fakeTransactions) {
+        await run(
+          `INSERT INTO tickets (user_id, game_id, numbers_json, purchase_total, payment_method, payment_status, status, confirmation_code) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [johnId, trans.gameId, JSON.stringify(trans.numbers), trans.total, trans.payment, trans.status === 'won' ? 'completed' : 'pending', trans.status, crypto.randomBytes(20).toString('hex')]
+        );
+      }
+    }
+  }
+
+  const winningCount = await get('SELECT COUNT(*) AS count FROM winning_numbers');
+  if (winningCount.count === 0) {
+    const games = await all('SELECT id FROM games ORDER BY id');
+    const sampleDraws = [
+      { date: '2026-03-30', numbers: [3, 12, 18, 24, 39] },
+      { date: '2026-03-23', numbers: [5, 11, 19, 27, 46] },
+      { date: '2026-03-16', numbers: [7, 14, 21, 33, 45] },
+    ];
+
+    for (const game of games) {
+      for (const draw of sampleDraws) {
+        await run(
+          'INSERT INTO winning_numbers (game_id, draw_date, numbers_json) VALUES (?, ?, ?)',
+          [game.id, draw.date, JSON.stringify(draw.numbers)]
+        );
+      }
+    }
   }
 }
 
@@ -287,6 +393,16 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
 });
 
 app.get('/api/games', authMiddleware, async (req, res) => {
+  const query = (req.query.q || '').trim();
+  if (query) {
+    const games = await all(
+      'SELECT id, name, price, prize_amount, drawing_date FROM games WHERE active = 1 AND name LIKE ? ORDER BY id',
+      [`%${query}%`]
+    );
+    res.json({ games });
+    return;
+  }
+
   const games = await all('SELECT id, name, price, prize_amount, drawing_date FROM games WHERE active = 1 ORDER BY id');
   res.json({ games });
 });
@@ -441,6 +557,8 @@ app.get('/api/history', authMiddleware, async (req, res) => {
       t.winning_numbers_json,
       t.matches,
       t.payout,
+      t.claim_status,
+      t.claimed_at,
       t.created_at,
       g.name AS game_name,
       g.drawing_date
@@ -464,9 +582,103 @@ app.get('/api/history', authMiddleware, async (req, res) => {
     status: r.status,
     matches: r.matches,
     payout: Number(r.payout),
+    claim_status: r.claim_status,
+    claimed_at: r.claimed_at,
   }));
 
   res.json({ tickets });
+});
+
+app.get('/api/history/:id', authMiddleware, async (req, res) => {
+  const row = await get(
+    `SELECT
+      t.id,
+      t.confirmation_code,
+      t.numbers_json,
+      t.purchase_total,
+      t.payment_method,
+      t.status,
+      t.winning_numbers_json,
+      t.matches,
+      t.payout,
+      t.claim_status,
+      t.claimed_at,
+      t.created_at,
+      g.name AS game_name,
+      g.drawing_date
+    FROM tickets t
+    JOIN games g ON g.id = t.game_id
+    WHERE t.user_id = ? AND t.id = ?`,
+    [req.user.id, req.params.id]
+  );
+
+  if (!row) {
+    res.status(404).json({ error: 'Ticket not found' });
+    return;
+  }
+
+  res.json({
+    ticket: {
+      id: row.id,
+      confirmation_code: row.confirmation_code,
+      game_name: row.game_name,
+      drawing_date: row.drawing_date,
+      created_at: row.created_at,
+      numbers: JSON.parse(row.numbers_json),
+      winning_numbers: row.winning_numbers_json ? JSON.parse(row.winning_numbers_json) : null,
+      purchase_total: Number(row.purchase_total),
+      payment_method: row.payment_method,
+      status: row.status,
+      matches: row.matches,
+      payout: Number(row.payout),
+      claim_status: row.claim_status,
+      claimed_at: row.claimed_at,
+    },
+  });
+});
+
+app.post('/api/claims/:ticketId', authMiddleware, async (req, res) => {
+  const { method } = req.body;
+  const allowedMethods = ['paypal', 'venmo', 'bank'];
+  if (!allowedMethods.includes(method)) {
+    res.status(400).json({ error: 'Invalid claim method' });
+    return;
+  }
+
+  const ticket = await get(
+    'SELECT id, status, payout, claim_status FROM tickets WHERE id = ? AND user_id = ?',
+    [req.params.ticketId, req.user.id]
+  );
+
+  if (!ticket) {
+    res.status(404).json({ error: 'Ticket not found' });
+    return;
+  }
+
+  if (ticket.status !== 'won' || Number(ticket.payout) <= 0) {
+    res.status(400).json({ error: 'Ticket is not eligible for a claim' });
+    return;
+  }
+
+  if (ticket.claim_status === 'claimed') {
+    res.status(400).json({ error: 'Ticket has already been claimed' });
+    return;
+  }
+
+  if (Number(ticket.payout) >= 600) {
+    res.json({
+      requireInPerson: true,
+      message: 'Claims of $600 or more must be verified in person at a claiming center.'
+    });
+    return;
+  }
+
+  await run(
+    'UPDATE tickets SET claim_status = ?, claimed_at = NOW() WHERE id = ? AND user_id = ?',
+    ['claimed', ticket.id, req.user.id]
+  );
+
+  res.json({ message: 'Claim processed successfully', requireInPerson: false });
 });
 
 app.get('/api/admin/stats', authMiddleware, adminOnly, async (req, res) => {
@@ -494,6 +706,25 @@ app.get('/api/admin/games', authMiddleware, adminOnly, async (req, res) => {
   res.json({ games });
 });
 
+app.put('/api/admin/games/:id', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { name, price, prizeAmount, drawingDate } = req.body;
+    if (!name || !price || !prizeAmount || !drawingDate) {
+      res.status(400).json({ error: 'All fields are required' });
+      return;
+    }
+
+    await run(
+      'UPDATE games SET name = ?, price = ?, prize_amount = ?, drawing_date = ? WHERE id = ?',
+      [name.trim(), Number(price), Number(prizeAmount), drawingDate, req.params.id]
+    );
+
+    res.json({ message: 'Game updated' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update game' });
+  }
+});
+
 app.post('/api/admin/games', authMiddleware, adminOnly, async (req, res) => {
   try {
     const { name, price, prizeAmount, drawingDate } = req.body;
@@ -518,6 +749,72 @@ app.post('/api/admin/games', authMiddleware, adminOnly, async (req, res) => {
 app.delete('/api/admin/games/:id', authMiddleware, adminOnly, async (req, res) => {
   await run('UPDATE games SET active = 0 WHERE id = ?', [req.params.id]);
   res.json({ message: 'Game removed' });
+});
+
+app.get('/api/admin/transactions/:userId', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const transactions = await all(
+      `SELECT 
+        t.id, 
+        t.confirmation_code, 
+        u.name AS user_name,
+        u.email,
+        g.name AS game_name, 
+        g.drawing_date,
+        t.created_at,
+        t.numbers_json,
+        t.purchase_total,
+        t.payment_method,
+        t.status,
+        t.matches,
+        t.payout
+      FROM tickets t
+      JOIN users u ON t.user_id = u.id
+      JOIN games g ON t.game_id = g.id
+      WHERE t.user_id = ?
+      ORDER BY t.created_at DESC`,
+      [userId]
+    );
+    
+    const formattedTransactions = transactions.map(t => ({
+      id: t.id,
+      confirmation_code: t.confirmation_code,
+      user_name: t.user_name,
+      email: t.email,
+      game_name: t.game_name,
+      drawing_date: t.drawing_date,
+      created_at: t.created_at,
+      numbers: JSON.parse(t.numbers_json),
+      purchase_total: Number(t.purchase_total),
+      payment_method: t.payment_method,
+      status: t.status,
+      matches: t.matches,
+      payout: Number(t.payout)
+    }));
+    
+    res.json({ transactions: formattedTransactions });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch transactions' });
+  }
+});
+
+app.get('/api/winning-numbers', authMiddleware, async (req, res) => {
+  const rows = await all(
+    `SELECT w.id, w.draw_date, w.numbers_json, g.name AS game_name
+     FROM winning_numbers w
+     JOIN games g ON g.id = w.game_id
+     ORDER BY w.draw_date DESC, g.name`
+  );
+
+  const draws = rows.map((row) => ({
+    id: row.id,
+    game_name: row.game_name,
+    draw_date: row.draw_date,
+    numbers: JSON.parse(row.numbers_json),
+  }));
+
+  res.json({ draws });
 });
 
 app.get('*', (req, res) => {

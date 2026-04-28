@@ -1,4 +1,6 @@
-/* Global Styles - Dark Mode Hulu-Inspired */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* Global Styles - Warm Editorial */
 * {
     margin: 0;
     padding: 0;
@@ -6,22 +8,26 @@
 }
 
 :root {
-    --primary-dark: #0f0f0f;
-    --secondary-dark: #1a1a1a;
-    --tertiary-dark: #2d2d2d;
-    --accent-green: #1ce783;
-    --accent-purple: #9c89f0;
-    --accent-orange: #ff6b35;
-    --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --border-color: #3d3d3d;
-    --error-color: #ff4757;
-    --success-color: #1ce783;
+    --primary-dark: #f6f1e8;
+    --secondary-dark: #ffffff;
+    --tertiary-dark: #fbf7f0;
+    --accent-green: #1f7a8c;
+    --accent-purple: #2d5f73;
+    --accent-orange: #f2a541;
+    --text-primary: #1f1b16;
+    --text-secondary: #5f5a53;
+    --border-color: #e5ddcf;
+    --error-color: #d9534f;
+    --success-color: #1f7a8c;
+    --shadow-soft: 0 12px 30px rgba(45, 38, 28, 0.12);
+    --shadow-light: 0 8px 16px rgba(45, 38, 28, 0.08);
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Outfit', 'Segoe UI', sans-serif;
     background-color: var(--primary-dark);
+    background-image: radial-gradient(circle at top left, rgba(242, 165, 65, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(31, 122, 140, 0.15), transparent 35%);
     color: var(--text-primary);
     line-height: 1.6;
 }
@@ -30,10 +36,11 @@ body {
 header {
     background-color: var(--secondary-dark);
     border-bottom: 1px solid var(--border-color);
-    padding: 1rem 2rem;
+    padding: 1.25rem 2rem;
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: var(--shadow-light);
 }
 
 nav {
@@ -47,7 +54,8 @@ nav {
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
-    background: linear-gradient(135deg, var(--accent-green), var(--accent-purple));
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, var(--accent-green), var(--accent-orange));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -64,6 +72,7 @@ nav {
     text-decoration: none;
     transition: color 0.3s ease;
     font-size: 0.95rem;
+    font-weight: 500;
 }
 
 .nav-links a:hover {
@@ -80,7 +89,7 @@ nav {
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+    background: linear-gradient(135deg, var(--accent-green), var(--accent-orange));
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -91,7 +100,7 @@ nav {
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 4px;
+    border-radius: 999px;
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -102,13 +111,13 @@ nav {
 
 .btn-primary {
     background-color: var(--accent-green);
-    color: #000;
+    color: #fff;
 }
 
 .btn-primary:hover {
-    background-color: #17b667;
+    background-color: #176574;
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(28, 231, 131, 0.3);
+    box-shadow: var(--shadow-light);
 }
 
 .btn-secondary {
@@ -118,7 +127,7 @@ nav {
 }
 
 .btn-secondary:hover {
-    background-color: var(--border-color);
+    background-color: #f1eadc;
     border-color: var(--accent-green);
 }
 
@@ -139,6 +148,7 @@ nav {
     border: 1px solid var(--border-color);
     max-width: 400px;
     width: 100%;
+    box-shadow: var(--shadow-soft);
 }
 
 .form-group {
@@ -165,7 +175,7 @@ textarea {
     background-color: var(--tertiary-dark);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
 }
@@ -217,15 +227,16 @@ textarea:focus {
 .card {
     background-color: var(--secondary-dark);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 16px;
     overflow: hidden;
     transition: all 0.3s ease;
+    box-shadow: var(--shadow-light);
 }
 
 .card:hover {
     border-color: var(--accent-green);
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(28, 231, 131, 0.15);
+    box-shadow: var(--shadow-soft);
 }
 
 .card-header {
@@ -286,29 +297,6 @@ section {
     color: var(--text-primary);
 }
 
-/* Search Bar */
-.search-bar {
-    position: relative;
-    max-width: 500px;
-}
-
-.search-bar input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    background-color: var(--tertiary-dark);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    border-radius: 4px;
-}
-
-.search-icon {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-secondary);
-}
-
 /* Utility Classes */
 .text-center {
     text-align: center;
@@ -334,11 +322,12 @@ section {
 
 /* Featured Section */
 .featured-section {
-    background: linear-gradient(135deg, rgba(156, 137, 240, 0.1) 0%, rgba(28, 231, 131, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(31, 122, 140, 0.12) 0%, rgba(242, 165, 65, 0.12) 100%);
     padding: 3rem;
-    border-radius: 8px;
+    border-radius: 20px;
     border: 1px solid var(--border-color);
     margin-bottom: 3rem;
+    box-shadow: var(--shadow-light);
 }
 
 .featured-title {
@@ -376,52 +365,6 @@ section {
     font-size: 0.9rem;
 }
 
-/* Toggle Switch */
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-}
-
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--tertiary-dark);
-    transition: 0.3s;
-    border-radius: 24px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: var(--text-primary);
-    transition: 0.3s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: var(--accent-green);
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
 /* Ticket Card Specific */
 .ticket-card {
     position: relative;
@@ -431,7 +374,7 @@ input:checked + .slider:before {
 .ticket-image {
     width: 100%;
     height: 150px;
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+    background: linear-gradient(135deg, var(--accent-green), var(--accent-orange));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -461,10 +404,11 @@ input:checked + .slider:before {
     margin: 5% auto;
     padding: 2rem;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 16px;
     max-width: 500px;
     width: 90%;
     animation: slideIn 0.3s ease;
+    box-shadow: var(--shadow-soft);
 }
 
 @keyframes slideIn {

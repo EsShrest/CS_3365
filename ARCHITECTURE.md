@@ -94,6 +94,8 @@ CREATE TABLE tickets (
   matches INT DEFAULT 0,                -- Count of matching numbers
   payout DECIMAL(12, 2) DEFAULT 0,       -- Calculated payout
   confirmation_code VARCHAR(60) NOT NULL, -- CNF-timestamp-random
+  claim_status VARCHAR(20) DEFAULT 'unclaimed', -- 'unclaimed' or 'claimed'
+  claimed_at DATETIME NULL,             -- When prize was claimed (NULL if unclaimed)
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(user_id) REFERENCES users(id),
   FOREIGN KEY(game_id) REFERENCES games(id)
@@ -105,6 +107,26 @@ CREATE TABLE tickets (
 - Foreign keys ensure referential integrity
 - `status` transitions: `pending` → `won` or `lost` when drawing date passes
 - `confirmation_code` gives users a unique identifier for each ticket
+- `claim_status` tracks whether prize has been claimed ('unclaimed' or 'claimed')
+- `claimed_at` timestamp records when user claimed their prize (null if unclaimed)
+
+### 4. Winning Numbers Table
+```sql
+CREATE TABLE winning_numbers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  game_id INT NOT NULL,
+  draw_date DATE NOT NULL,
+  numbers_json TEXT NOT NULL,           -- [3,12,18,24,39] as JSON string
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(game_id) REFERENCES games(id)
+)
+```
+
+**Key Features:**
+- Stores historical winning draws for each game
+- Seeded with 3 sample draws × 4 games = 12 records on first run
+- Used to display "Previous Winning Numbers" page to users
+- Supports win calculation when tickets are purchased with past drawing dates
 
 ---
 
@@ -205,6 +227,76 @@ app.METHOD('/api/route', [middleware], async (req, res) => {
 
 #### `DELETE /api/admin/games/:id` (admin only)
 - Soft delete: `UPDATE games SET active = 0 WHERE id = ?`
+
+#### `PUT /api/admin/games/:id` (admin only)
+- **Input**: `{ name, price, prizeAmount, drawingDate }`
+- Updates existing game: Price, prize amount, name, and drawing date
+- **Response**: `{ message: 'Game updated' }`
+
+### Enhanced Endpoints (Search & Details)
+
+#### `GET /api/games?q=query` (auth required)
+- **Query Parameter**: `q` (optional search string)
+- Returns games matching the search query (case-insensitive substring match)
+- If no query: returns all active games
+- **Response**: `{ games: [...] }`
+- **Use Case**: Real-time ticket search on browse page
+
+#### `GET /api/history/:id` (auth required)
+- **Path Parameter**: `id` (ticket ID)
+- Returns single ticket with full details including:
+  - Ticket ID, confirmation code, game info, numbers, status
+  - Winning numbers (if draw date has passed)
+  - Payout amount, matches count
+  - **claim_status** ('unclaimed' or 'claimed')
+  - **claimed_at** timestamp (null if not yet claimed)
+- **Response**: `{ ticket: { ...with all fields... } }`
+- **Use Case**: Display order details in modal when user clicks history row
+
+### Claims & Prize Management
+
+#### `POST /api/claims/:ticketId` (auth required)
+- **Claim Prize** for winning ticket
+- **Validation**:
+  - Ticket must belong to authenticated user
+  - Ticket must have winning status (`status = 'won'`)
+  - Payout must be > 0
+  - Prevent duplicate claims (check `claim_status != 'claimed'`)
+- **Business Logic**:
+  - **If payout < $600**: 
+    - Update `claim_status = 'claimed'`, set `claimed_at = NOW()`
+    - Return: `{ message: 'Claim processed successfully', requireInPerson: false }`
+  - **If payout ≥ $600**:
+    - Do NOT update database
+    - Return: `{ requireInPerson: true, message: 'Claims of $600 or more must be verified in person.' }`
+- **Response Examples**:
+  ```json
+  // Online claim success
+  { "message": "Claim processed successfully", "requireInPerson": false }
+  
+  // In-person claim required
+  { "requireInPerson": true, "message": "Claims of $600 or more must be verified in person." }
+  ```
+- **Use Case**: User claims prize from order details modal
+
+### Winning Numbers Display
+
+#### `GET /api/winning-numbers` (auth required)
+- Returns all historical winning draws across all games
+- **Response**:
+  ```json
+  {
+    "draws": [
+      {
+        "game_name": "Power Ball",
+        "draw_date": "2026-03-30",
+        "winning_numbers": [3, 12, 18, 24, 39]
+      },
+      ...
+    ]
+  }
+  ```
+- **Use Case**: Display on dedicated "Previous Winning Numbers" page
 
 ---
 
@@ -546,8 +638,77 @@ appendLog('email.log', `[${new Date().toISOString()}] to=${req.user.email} subje
 
 ---
 
-## Summary
+## Frontend Architecture & Pages
 
+### New Pages
+
+#### `winning-numbers.html`
+- **Purpose**: Display historical winning numbers across all games
+- **Features**:
+  - Table with columns: Game Name, Draw Date, Winning Numbers
+  - Calls `/api/winning-numbers` on page load
+  - Accessible from main navigation on all pages
+  - Styled to match warm editorial theme (cream, teal, orange accents)
+
+#### Order Details Modal (`order-details-modal` in order-history.html)
+- **Trigger**: Click on any order row in order history
+- **Displays**:
+  - Ticket ID, confirmation code
+  - Game name, draw date, selected numbers
+  - Winning numbers (if draw date has passed)
+  - Ticket status (pending, won, lost)
+  - Payout amount, matches
+  - **Claim Action** (conditional):
+    - If `status = 'won'` and `payout > 0`:
+      - If `claim_status = 'claimed'`: Show "Already claimed" message
+      - If `payout ≥ $600`: Show "In-person claim required at claiming center" message
+      - If `payout < $600`: Show claim form with payment method select (PayPal, Venmo, Bank) + Claim button
+    - If `status != 'won'`: Hide claim action
+  - Print Ticket button → Opens printable version in new window
+- **Validation**: Prevents accessing tickets belonging to other users via endpoint check
+
+### Search Features
+
+#### Dashboard Search Form
+- **Location**: dashboard.html (visible below welcome message)
+- **Behavior**: Text input + "Search" button
+- **Action**: Submits to `browse-tickets.html?q=searchterm`
+
+#### Browse Page Real-Time Search
+- **Location**: browse-tickets.html (card above game grid)
+- **Behavior**: Live filtering as user types
+- **Action**: Filters game list in real-time via `renderBrowseGames(query)` function
+- **Matching**: Case-insensitive substring match on game name
+
+### Navigation Updates
+All main pages now include "Winning Numbers" link in header navigation:
+- dashboard.html
+- browse-tickets.html
+- ticket-details.html
+- order-history.html
+- profile.html
+- admin-dashboard.html
+- admin-tickets.html
+
+### JavaScript Functions (script.js)
+
+**New Search Functions:**
+- `renderBrowseGames(query)` – Filters games by substring match, re-renders grid
+- Dashboard search form wiring in `initDashboard()`
+
+**New Order Details Functions:**
+- `openOrderDetails(ticketId)` – Fetches `/api/history/:id`, displays modal with all fields
+- `claimPrize(ticketId)` – Calls `/api/claims/:ticketId`, handles online/in-person response
+- `printTicket()` – Opens popup with printable ticket details
+
+**New Winning Numbers Function:**
+- `initWinningNumbers()` – Fetches `/api/winning-numbers`, populates table
+
+**New Admin Edit Functions:**
+- `openEditTicket(id)` – Populates edit-ticket-modal with selected game data
+- `updateTicket()` – Calls `PUT /api/admin/games/:currentEditTicketId`, reloads table
+
+---
 **Design Principles:**
 - Defense in depth: Validation at input, sanitization in logic, constraints at DB
 - Fail securely: Errors don't leak sensitive info (generic 401/403 messages)

@@ -12,13 +12,12 @@
             <div class="logo">🎰 LottoPlay Admin</div>
             <ul class="nav-links">
                 <li><a href="admin-dashboard.html">Dashboard</a></li>
-                <li><a href="admin-tickets.html">Manage Tickets</a></li>
-                <li><a href="#" onclick="alert('Sales Analytics')">Analytics</a></li>
-                <li><a href="#" onclick="alert('User Management')">Users</a></li>
+                <li><a href="#manage-tickets-section">Manage Tickets</a></li>
             </ul>
             <div class="user-menu">
                 <span class="text-muted">Admin</span>
                 <div class="user-icon">👨‍💼</div>
+                <a href="profile.html" class="btn btn-secondary">Profile</a>
                 <a href="index.html" class="btn btn-danger">Logout</a>
             </div>
         </nav>
@@ -58,225 +57,404 @@
 
         <!-- Quick Actions -->
         <section class="mb-4">
-            <h3 class="section-title">Quick Actions</h3>
-            <div class="grid grid-4">
-                <button class="card" style="cursor: pointer; border: none; padding: 0; text-align: center; transition: all 0.3s ease;" onclick="openModal('new-ticket-modal')" onmouseover="this.style.borderColor = 'var(--accent-green)'" onmouseout="this.style.borderColor = 'var(--border-color)'">
-                    <div class="card-body">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎟️</div>
-                        <p>Add New Ticket</p>
-                    </div>
-                </button>
-
-                <button class="card" style="cursor: pointer; border: none; padding: 0; text-align: center; transition: all 0.3s ease;" onclick="openModal('announce-modal')" onmouseover="this.style.borderColor = 'var(--accent-green)'" onmouseout="this.style.borderColor = 'var(--border-color)'">
-                    <div class="card-body">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📢</div>
-                        <p>Announcements</p>
-                    </div>
-                </button>
-
-                <button class="card" style="cursor: pointer; border: none; padding: 0; text-align: center; transition: all 0.3s ease;" onclick="alert('Reports generated')" onmouseover="this.style.borderColor = 'var(--accent-green)'" onmouseout="this.style.borderColor = 'var(--border-color)'">
-                    <div class="card-body">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📊</div>
-                        <p>Generate Reports</p>
-                    </div>
-                </button>
-
-                <button class="card" style="cursor: pointer; border: none; padding: 0; text-align: center; transition: all 0.3s ease;" onclick="alert('Settings opened')" onmouseover="this.style.borderColor = 'var(--accent-green)'" onmouseout="this.style.borderColor = 'var(--border-color)'">
-                    <div class="card-body">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚙️</div>
-                        <p>Settings</p>
-                    </div>
-                </button>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="#manage-tickets-section" class="btn btn-primary" onclick="document.getElementById('manage-tickets-section').scrollIntoView({behavior: 'smooth'});">📋 Manage Tickets</a>
+                <a href="#announcements-section" class="btn btn-primary" onclick="document.getElementById('announcements-section').scrollIntoView({behavior: 'smooth'});">📢 Announcements</a>
             </div>
         </section>
 
-        <!-- Recent Transactions -->
-        <section>
-            <h3 class="section-title">Recent Transactions</h3>
+        <!-- Manage Tickets Section -->
+        <section id="manage-tickets-section" class="mb-4">
+            <h3 class="section-title mb-4">Manage Tickets</h3>
+
+            <!-- Add Ticket Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Add New Ticket</h4>
+                    <form id="add-ticket-form" onsubmit="handleAddTicket(event)">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="form-group">
+                                <label for="ticket-name">Ticket Name</label>
+                                <input type="text" id="ticket-name" placeholder="Enter ticket name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticket-price">Price ($)</label>
+                                <input type="number" id="ticket-price" placeholder="0.00" step="0.01" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticket-prize">Prize Amount ($)</label>
+                                <input type="number" id="ticket-prize" placeholder="0.00" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticket-date">Drawing Date</label>
+                                <input type="date" id="ticket-date" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Add Ticket</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tickets List -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h4 class="mb-0">All Tickets</h4>
+                </div>
+
+                <div class="card">
+                    <div class="card-body" style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--border-color);">
+                                    <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">ID</th>
+                                    <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Ticket Name</th>
+                                    <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Price</th>
+                                    <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Prize</th>
+                                    <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Drawing Date</th>
+                                    <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tickets-table-body">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section id="transactions-section" class="mb-4">
+            <h3 class="section-title mb-4">User Transactions</h3>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="search-user-id">Search by User ID</label>
+                                <input type="number" id="search-user-id" placeholder="Enter user ID..." min="1">
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-primary" onclick="searchTransactions()">🔍 Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-body" style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid var(--border-color);">
-                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">User</th>
-                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Ticket</th>
-                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Amount</th>
-                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Date</th>
-                                <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 1rem;">John Doe</td>
-                                <td style="padding: 1rem;">Mega Lottery</td>
-                                <td style="padding: 1rem;">$5.00</td>
-                                <td style="padding: 1rem;">May 2, 2026</td>
-                                <td style="padding: 1rem;">
-                                    <span style="background: rgba(28, 231, 131, 0.2); color: var(--accent-green); padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">✓ Completed</span>
-                                </td>
-                            </tr>
-
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 1rem;">Jane Smith</td>
-                                <td style="padding: 1rem;">Lucky Draw</td>
-                                <td style="padding: 1rem;">$2.00</td>
-                                <td style="padding: 1rem;">May 2, 2026</td>
-                                <td style="padding: 1rem;">
-                                    <span style="background: rgba(28, 231, 131, 0.2); color: var(--accent-green); padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">✓ Completed</span>
-                                </td>
-                            </tr>
-
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 1rem;">Bob Wilson</td>
-                                <td style="padding: 1rem;">Premium Draw</td>
-                                <td style="padding: 1rem;">$10.00</td>
-                                <td style="padding: 1rem;">May 1, 2026</td>
-                                <td style="padding: 1rem;">
-                                    <span style="background: rgba(28, 231, 131, 0.2); color: var(--accent-green); padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">✓ Completed</span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style="padding: 1rem;">Alice Brown</td>
-                                <td style="padding: 1rem;">Grand Prize</td>
-                                <td style="padding: 1rem;">$15.00</td>
-                                <td style="padding: 1rem;">May 1, 2026</td>
-                                <td style="padding: 1rem;">
-                                    <span style="background: rgba(28, 231, 131, 0.2); color: var(--accent-green); padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">✓ Completed</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div id="transactions-container">
+                        <p class="text-muted">Enter a user ID and click search to view transactions</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Charts Section -->
-        <section style="margin-top: 2rem;">
-            <h3 class="section-title">Monthly Statistics</h3>
-            <div class="grid grid-2">
-                <div class="card">
-                    <div class="card-body">
-                        <h4>Revenue Trend</h4>
-                        <p class="text-muted" style="margin-top: 1rem;">Chart visualization would be displayed here</p>
-                        <div style="height: 200px; background: linear-gradient(135deg, rgba(28, 231, 131, 0.1), rgba(156, 137, 240, 0.1)); border-radius: 4px; margin-top: 1rem; display: flex; align-items: flex-end; justify-content: space-around; padding: 1rem;">
-                            <div style="width: 20px; height: 40%; background: var(--accent-green); border-radius: 4px;"></div>
-                            <div style="width: 20px; height: 60%; background: var(--accent-green); border-radius: 4px;"></div>
-                            <div style="width: 20px; height: 50%; background: var(--accent-green); border-radius: 4px;"></div>
-                            <div style="width: 20px; height: 70%; background: var(--accent-green); border-radius: 4px;"></div>
-                            <div style="width: 20px; height: 55%; background: var(--accent-green); border-radius: 4px;"></div>
+        <!-- Announcements Section -->
+        <section id="announcements-section" class="mb-4">
+            <h3 class="section-title mb-4">📢 Announcements</h3>
+
+            <!-- Create Announcement -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Create New Announcement</h4>
+                    <form id="announcement-form" onsubmit="handleCreateAnnouncement(event)">
+                        <div class="form-group">
+                            <label for="announcement-title">Title</label>
+                            <input type="text" id="announcement-title" placeholder="Enter announcement title" required>
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <label for="announcement-message">Message</label>
+                            <textarea id="announcement-message" placeholder="Enter announcement message..." rows="4" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; resize: vertical;" required></textarea>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="form-group">
+                                <label for="announcement-type">Type</label>
+                                <select id="announcement-type" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--tertiary-dark); color: var(--text-primary);">
+                                    <option value="info">ℹ️ Info</option>
+                                    <option value="warning">⚠️ Warning</option>
+                                    <option value="success">✅ Success</option>
+                                    <option value="urgent">🔴 Urgent</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="announcement-date">Publish Date</label>
+                                <input type="date" id="announcement-date" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">📤 Publish Announcement</button>
+                    </form>
                 </div>
+            </div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <h4>Ticket Sales Distribution</h4>
-                        <p class="text-muted" style="margin-top: 1rem;">Distribution of sales by ticket type</p>
-                        <div style="margin-top: 1rem;">
-                            <div style="margin-bottom: 1rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span>Mega Lottery</span>
-                                    <span>35%</span>
-                                </div>
-                                <div style="height: 8px; background: var(--tertiary-dark); border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; width: 35%; background: var(--accent-green);"></div>
-                                </div>
-                            </div>
-
-                            <div style="margin-bottom: 1rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span>Lucky Draw</span>
-                                    <span>25%</span>
-                                </div>
-                                <div style="height: 8px; background: var(--tertiary-dark); border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; width: 25%; background: var(--accent-purple);"></div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span>Premium Draw</span>
-                                    <span>40%</span>
-                                </div>
-                                <div style="height: 8px; background: var(--tertiary-dark); border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; width: 40%; background: var(--accent-orange);"></div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Published Announcements -->
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="mb-3">Published Announcements</h4>
+                    <div id="announcements-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p class="text-muted">No announcements yet</p>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- New Ticket Modal -->
-    <div id="new-ticket-modal" class="modal">
+    <!-- Edit Ticket Modal -->
+    <div id="edit-ticket-modal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
-            <span class="close-btn" onclick="closeModal('new-ticket-modal')">&times;</span>
-            <h2 class="mb-3">Add New Ticket</h2>
+            <span class="close-btn" onclick="closeModal('edit-ticket-modal')">&times;</span>
+            <h2 class="mb-3">Edit Ticket</h2>
             <form>
                 <div class="form-group">
-                    <label for="ticket-name">Ticket Name</label>
-                    <input type="text" id="ticket-name" placeholder="e.g., Mega Lottery" required>
+                    <label for="edit-ticket-name">Ticket Name</label>
+                    <input type="text" id="edit-ticket-name" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="ticket-price">Ticket Price</label>
-                    <input type="number" id="ticket-price" placeholder="e.g., 5.00" step="0.01" required>
+                    <label for="edit-ticket-price">Price ($)</label>
+                    <input type="number" id="edit-ticket-price" step="0.01" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="ticket-prize">Prize Amount</label>
-                    <input type="number" id="ticket-prize" placeholder="e.g., 1000000" required>
+                    <label for="edit-ticket-prize">Prize Amount ($)</label>
+                    <input type="number" id="edit-ticket-prize" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="ticket-date">Drawing Date</label>
-                    <input type="date" id="ticket-date" required>
+                    <label for="edit-ticket-date">Drawing Date</label>
+                    <input type="date" id="edit-ticket-date" required>
                 </div>
 
                 <button type="button" class="btn btn-primary" style="width: 100%;" 
-                        onclick="showAlert('Ticket added successfully', 'success'); closeModal('new-ticket-modal');">
-                    Create Ticket
+                        onclick="updateTicket()">
+                    Update Ticket
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Announcement Modal -->
-    <div id="announce-modal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <span class="close-btn" onclick="closeModal('announce-modal')">&times;</span>
-            <h2 class="mb-3">New Announcement</h2>
-            <form>
-                <div class="form-group">
-                    <label for="announce-title">Title</label>
-                    <input type="text" id="announce-title" placeholder="Announcement title" required>
-                </div>
+    <style>
+        table tr:hover {
+            background-color: var(--tertiary-dark);
+        }
 
-                <div class="form-group">
-                    <label for="announce-message">Message</label>
-                    <textarea id="announce-message" rows="4" placeholder="Type your announcement..." required></textarea>
-                </div>
+        table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-                <div class="form-group">
-                    <label for="announce-audience">Audience</label>
-                    <select id="announce-audience" required>
-                        <option>All Users</option>
-                        <option>Active Users</option>
-                        <option>New Users</option>
-                    </select>
-                </div>
-
-                <button type="button" class="btn btn-primary" style="width: 100%;" 
-                        onclick="showAlert('Announcement published successfully', 'success'); closeModal('announce-modal');">
-                    Publish
-                </button>
-            </form>
-        </div>
-    </div>
+        table th {
+            padding: 1rem;
+        }
+    </style>
 
     <script src="script.js"></script>
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            initAdminDashboard();
+            loadAdminGames();
+        });
+
+        // Search transactions by user ID
+        async function searchTransactions() {
+            const userId = document.getElementById('search-user-id').value;
+            if (!userId) {
+                showAlert('Please enter a user ID', 'error');
+                return;
+            }
+
+            try {
+                const data = await api(`/api/admin/transactions/${userId}`);
+                displayTransactions(data.transactions);
+            } catch (error) {
+                showAlert(error.message, 'error');
+                document.getElementById('transactions-container').innerHTML = '<p class="text-muted">No transactions found</p>';
+            }
+        }
+
+        function displayTransactions(transactions) {
+            const container = document.getElementById('transactions-container');
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = '<p class="text-muted">No transactions found for this user</p>';
+                return;
+            }
+
+            let html = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color);">
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">ID</th>
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">User</th>
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Game</th>
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Amount</th>
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Payment</th>
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Status</th>
+                            <th style="text-align: left; padding: 1rem; color: var(--text-secondary);">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            transactions.forEach(t => {
+                const date = new Date(t.created_at).toLocaleDateString();
+                const statusColor = t.status === 'won' ? 'var(--accent-green)' : 
+                                   t.status === 'completed' ? 'var(--accent-purple)' : 
+                                   'var(--text-secondary)';
+                
+                html += `
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1rem;">${t.id}</td>
+                        <td style="padding: 1rem;">
+                            <div>${t.user_name}</div>
+                            <small style="color: var(--text-secondary);">${t.email}</small>
+                        </td>
+                        <td style="padding: 1rem;">${t.game_name}</td>
+                        <td style="padding: 1rem;">$${t.purchase_total.toFixed(2)}</td>
+                        <td style="padding: 1rem;">${t.payment_method}</td>
+                        <td style="padding: 1rem; color: ${statusColor}; font-weight: bold;">${t.status.toUpperCase()}</td>
+                        <td style="padding: 1rem;">${date}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <style>
+                    table tr:hover {
+                        background-color: var(--tertiary-dark);
+                    }
+                </style>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Allow Enter key to search
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-user-id');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        searchTransactions();
+                    }
+                });
+            }
+            
+            // Set date to today
+            const dateInput = document.getElementById('announcement-date');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+            
+            // Load announcements from localStorage
+            loadAnnouncements();
+        });
+
+        // Handle announcement creation
+        async function handleCreateAnnouncement(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('announcement-title').value;
+            const message = document.getElementById('announcement-message').value;
+            const type = document.getElementById('announcement-type').value;
+            const date = document.getElementById('announcement-date').value;
+            
+            if (!title.trim() || !message.trim()) {
+                showAlert('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Store announcement in localStorage (for demo purposes)
+            const announcement = {
+                id: Date.now(),
+                title,
+                message,
+                type,
+                date,
+                created_at: new Date().toLocaleString()
+            };
+            
+            let announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            announcements.unshift(announcement);
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            // Reset form
+            document.getElementById('announcement-form').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('announcement-date').value = today;
+            
+            showAlert('Announcement published successfully!', 'success');
+            loadAnnouncements();
+        }
+
+        // Load and display announcements
+        function loadAnnouncements() {
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            const container = document.getElementById('announcements-list');
+            
+            if (announcements.length === 0) {
+                container.innerHTML = '<p class="text-muted">No announcements yet</p>';
+                return;
+            }
+            
+            let html = '';
+            announcements.forEach(ann => {
+                const iconMap = {
+                    'info': 'ℹ️',
+                    'warning': '⚠️',
+                    'success': '✅',
+                    'urgent': '🔴'
+                };
+                
+                const colorMap = {
+                    'info': 'var(--accent-green)',
+                    'warning': 'var(--accent-orange)',
+                    'success': 'var(--accent-green)',
+                    'urgent': '#e74c3c'
+                };
+                
+                const icon = iconMap[ann.type] || 'ℹ️';
+                const color = colorMap[ann.type] || 'var(--accent-green)';
+                
+                html += `
+                    <div style="padding: 1.5rem; border: 2px solid ${color}; border-radius: 12px; background: linear-gradient(135deg, rgba(31, 122, 140, 0.05) 0%, rgba(255, 198, 41, 0.05) 100%); position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                            <div>
+                                <h5 style="margin: 0 0 0.5rem 0; color: ${color}; font-size: 1.1rem;">${icon} ${ann.title}</h5>
+                                <small style="color: var(--text-secondary);">${new Date(ann.date).toLocaleDateString()} • Published ${new Date(ann.created_at).toLocaleString()}</small>
+                            </div>
+                            <button onclick="deleteAnnouncement(${ann.id})" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; padding: 0;">✕</button>
+                        </div>
+                        <p style="margin: 1rem 0 0 0; color: var(--text-primary); line-height: 1.6;">${ann.message}</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Delete announcement
+        function deleteAnnouncement(id) {
+            let announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            announcements = announcements.filter(ann => ann.id !== id);
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            loadAnnouncements();
+            showAlert('Announcement deleted', 'success');
+        }
+    </script>
 </body>
 </html>
