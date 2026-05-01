@@ -254,50 +254,155 @@ async function initDb() {
   // Add fake transactions for John Doe
   const johnTransactions = await all('SELECT id FROM tickets WHERE user_id = ?', [johnDoeUser.insertId || johnDoeUser.id || 2]);
   const johnId = johnDoeUser.insertId || johnDoeUser.id || 2;
-  
+
+  await run('UPDATE tickets SET status = "lost" WHERE user_id = ? AND status = "completed"', [johnId]);
+
+  const seedGames = await all('SELECT id, price, prize_amount FROM games ORDER BY id LIMIT 4');
+
   if (johnTransactions.length === 0) {
-    // Get game IDs
-    const games = await all('SELECT id FROM games LIMIT 4');
-    
-    if (games.length > 0) {
-      const fakeTransactions = [
+    if (seedGames.length > 0) {
+      const baseTransactions = [
         {
-          gameId: games[0].id,
+          gameId: seedGames[0].id,
+          price: seedGames[0].price,
           numbers: [7, 14, 21, 35, 42],
-          payment: 'Credit Card',
+          payment: 'paypal',
           status: 'pending',
-          total: 2.00
+          winningNumbers: null,
+          matches: 0,
+          payout: 0,
         },
         {
-          gameId: games[1].id,
+          gameId: seedGames[1].id,
+          price: seedGames[1].price,
           numbers: [5, 15, 25, 35, 45],
-          payment: 'PayPal',
-          status: 'completed',
-          total: 2.00
+          payment: 'venmo',
+          status: 'lost',
+          winningNumbers: [2, 8, 19, 31, 44],
+          matches: 0,
+          payout: 0,
         },
         {
-          gameId: games[2].id,
+          gameId: seedGames[2].id,
+          price: seedGames[2].price,
           numbers: [3, 9, 17, 33, 48],
-          payment: 'Venmo',
-          status: 'completed',
-          total: 1.00
+          payment: 'bank',
+          status: 'lost',
+          winningNumbers: [1, 11, 18, 22, 39],
+          matches: 0,
+          payout: 0,
         },
         {
-          gameId: games[3].id,
+          gameId: seedGames[3].id,
+          price: seedGames[3].price,
           numbers: [2, 8, 16, 24, 40],
-          payment: 'Bank Transfer',
+          payment: 'paypal',
           status: 'won',
-          total: 1.00
-        }
+          winningNumbers: [2, 8, 16, 24, 40],
+          matches: 5,
+          payout: Number(seedGames[3].prize_amount),
+        },
       ];
-      
-      for (const trans of fakeTransactions) {
+
+      for (const trans of baseTransactions) {
         await run(
-          `INSERT INTO tickets (user_id, game_id, numbers_json, purchase_total, payment_method, payment_status, status, confirmation_code) 
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [johnId, trans.gameId, JSON.stringify(trans.numbers), trans.total, trans.payment, trans.status === 'won' ? 'completed' : 'pending', trans.status, crypto.randomBytes(20).toString('hex')]
+          `INSERT INTO tickets (user_id, game_id, numbers_json, purchase_total, payment_method, payment_status, status, winning_numbers_json, matches, payout, confirmation_code)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            johnId,
+            trans.gameId,
+            JSON.stringify(trans.numbers),
+            Number(trans.price),
+            trans.payment,
+            trans.status === 'pending' ? 'pending' : 'paid',
+            trans.status,
+            trans.winningNumbers ? JSON.stringify(trans.winningNumbers) : null,
+            trans.matches,
+            trans.payout,
+            crypto.randomBytes(20).toString('hex'),
+          ]
         );
       }
+    }
+  }
+
+  if (seedGames.length > 0) {
+    const seededRows = await all('SELECT COUNT(*) AS count FROM tickets WHERE user_id = ?', [johnId]);
+    const existingCount = seededRows[0]?.count || 0;
+    const desiredCount = 7;
+
+    if (existingCount < desiredCount) {
+      const extraWinningTickets = [
+        {
+          gameId: seedGames[0].id,
+          price: seedGames[0].price,
+          numbers: [1, 2, 3, 4, 5],
+          winningNumbers: [1, 2, 6, 7, 8],
+          matches: 2,
+          payout: 250,
+          payment: 'paypal',
+        },
+        {
+          gameId: seedGames[1].id,
+          price: seedGames[1].price,
+          numbers: [10, 11, 12, 13, 14],
+          winningNumbers: [10, 11, 12, 40, 41],
+          matches: 3,
+          payout: 500,
+          payment: 'venmo',
+        },
+        {
+          gameId: seedGames[2].id,
+          price: seedGames[2].price,
+          numbers: [20, 21, 22, 23, 24],
+          winningNumbers: [20, 21, 22, 23, 24],
+          matches: 5,
+          payout: 1000,
+          payment: 'bank',
+        },
+      ];
+
+      const needed = desiredCount - existingCount;
+      for (const trans of extraWinningTickets.slice(0, needed)) {
+        await run(
+          `INSERT INTO tickets (user_id, game_id, numbers_json, purchase_total, payment_method, payment_status, status, winning_numbers_json, matches, payout, confirmation_code)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          ,
+          [
+            johnId,
+            trans.gameId,
+            JSON.stringify(trans.numbers),
+            Number(trans.price),
+            trans.payment,
+            'paid',
+            'won',
+            JSON.stringify(trans.winningNumbers),
+            trans.matches,
+            trans.payout,
+            crypto.randomBytes(20).toString('hex'),
+          ]
+        );
+      }
+    }
+
+    const missingWinningNumbers = await all(
+      `SELECT t.id, t.status, t.numbers_json, g.prize_amount
+       FROM tickets t
+       JOIN games g ON g.id = t.game_id
+       WHERE t.user_id = ? AND t.status <> 'pending' AND t.winning_numbers_json IS NULL`,
+      [johnId]
+    );
+
+    for (const ticket of missingWinningNumbers) {
+      const ticketNumbers = JSON.parse(ticket.numbers_json);
+      const winningNumbers = ticket.status === 'won' ? ticketNumbers : randomNumbers();
+      const matches = ticket.status === 'won' ? ticketNumbers.length : 0;
+      const payout = ticket.status === 'won' ? Number(ticket.prize_amount) : 0;
+
+      await run(
+        'UPDATE tickets SET winning_numbers_json = ?, matches = ?, payout = ? WHERE id = ? AND user_id = ?',
+        [JSON.stringify(winningNumbers), matches, payout, ticket.id, johnId]
+      );
     }
   }
 
