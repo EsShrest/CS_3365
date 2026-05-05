@@ -197,6 +197,12 @@ function formatMoney(value) {
     return `$${Number(value || 0).toFixed(2)}`;
 }
 
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+}
+
 function getPageName() {
     return window.location.pathname.split('/').pop() || 'index.html';
 }
@@ -446,9 +452,7 @@ async function initOrderHistory() {
                 <tr style="border-bottom: 1px solid var(--border-color); cursor: pointer;" data-ticket-id="${ticket.id}">
                     <td style="padding: 1rem;">#${ticket.id}</td>
                     <td style="padding: 1rem;">${ticket.game_name}</td>
-                    <td style="padding: 1rem;">${ticket.created_at}</td>
-                    <td style="padding: 1rem;">${ticket.drawing_date}</td>
-                    <td style="padding: 1rem;">${ticket.numbers.join(', ')}</td>
+                    <td style="padding: 1rem;">${formatDate(ticket.created_at)}</td>    <td style="padding: 1rem;">${formatDate(ticket.drawing_date)}</td> <td style="padding: 1rem;">${ticket.numbers.join(', ')}</td>
                     <td style="padding: 1rem;">${formatMoney(ticket.purchase_total)}</td>
                     <td style="padding: 1rem;">${renderStatusBadge(ticket.status)}</td>
                     <td style="padding: 1rem;">${ticket.payout > 0 ? formatMoney(ticket.payout) : '-'}</td>
@@ -522,7 +526,7 @@ async function openOrderDetails(ticketId) {
                 </div>
                 <div>
                     <p class="text-muted">Confirmation Code</p>
-                    <div style="font-weight: bold;">${ticket.confirmation_code}</div>
+                    <span class="conf-code-display">${ticket.confirmation_code}</span>
                 </div>
                 <div>
                     <p class="text-muted">Game</p>
@@ -530,7 +534,7 @@ async function openOrderDetails(ticketId) {
                 </div>
                 <div>
                     <p class="text-muted">Draw Date</p>
-                    <div style="font-weight: bold;">${ticket.drawing_date}</div>
+                    <div style="font-weight: bold;">${formatDate(ticket.drawing_date)}</div>
                 </div>
                 <div>
                     <p class="text-muted">Numbers</p>
@@ -632,7 +636,7 @@ async function initWinningNumbers() {
         tableBody.innerHTML = draws.map((draw) => `
             <tr style="border-bottom: 1px solid var(--border-color);">
                 <td style="padding: 1rem;">${draw.game_name}</td>
-                <td style="padding: 1rem;">${draw.draw_date}</td>
+                <td style="padding: 1rem;">${formatDate(draw.draw_date)}</td>
                 <td style="padding: 1rem;">${draw.numbers.join(', ')}</td>
             </tr>
         `).join('');
